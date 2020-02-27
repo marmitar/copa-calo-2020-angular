@@ -1,0 +1,33 @@
+<div *ngIf="error">
+    Error: {{ error }}
+</div>
+
+<div [ngSwitch]="logged | async">
+    <ng-container *ngSwitchCase="'logged'">
+        <button (click)="logout()">Logout</button>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'loading'">
+        Loading...
+    </ng-container>
+
+    <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="showLogin"></ng-container>
+    </ng-container>
+</div>
+
+<ng-template #showLogin>
+    <form [formGroup]="form" (ngSubmit)="login()">
+
+        <label>
+            E-mail:
+            <input type="email" formControlName="email">
+        </label>
+        <label>
+            Password:
+            <input type="password" formControlName="password">
+        </label>
+
+        <button type="submit" [disabled]="!form.valid">Login</button>
+    </form>
+</ng-template>
