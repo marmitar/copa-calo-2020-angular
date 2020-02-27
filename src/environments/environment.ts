@@ -1,3 +1,5 @@
+import { ORIGIN } from '@angular/fire/functions'
+
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -12,7 +14,8 @@ export const environment = {
         storageBucket: 'copa-calo-devel.appspot.com',
         messagingSenderId: '663939319924',
         appId: '1:663939319924:web:3e1e8232663933b0c1e921'
-    }
+    },
+    functions: { provide: ORIGIN, useValue: 'http://localhost:5000' }
 }
 
 /*
