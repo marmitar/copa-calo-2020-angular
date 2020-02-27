@@ -20,10 +20,12 @@
     ],
     "noUnusedLocals": true,
     "strictNullChecks": true,
-    "removeComments": true
+    "removeComments": true,
+    "noEmitOnError": true
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
+    "strictInjectionParameters": true,
+    "strictMetadataEmit" : true
   }
 }
