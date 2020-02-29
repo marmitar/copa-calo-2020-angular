@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
-import { LoginComponent } from './login/login.component'
 import { environment } from '../environments/environment'
 
 import { ReactiveFormsModule } from '@angular/forms'
@@ -12,11 +11,12 @@ import { AngularFireAuthModule } from '@angular/fire/auth'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFireFunctionsModule } from '@angular/fire/functions'
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
     declarations: [
-        AppComponent,
-        LoginComponent
+        AppComponent
     ],
     imports: [
         BrowserModule,
@@ -25,7 +25,8 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions'
         AngularFireModule.initializeApp(environment.firebase),
         AngularFireAuthModule,
         AngularFirestoreModule,
-        AngularFireFunctionsModule
+        AngularFireFunctionsModule,
+        BrowserAnimationsModule
     ],
     providers: [environment.functions],
     bootstrap: [AppComponent]
