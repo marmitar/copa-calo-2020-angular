@@ -1,16 +1,1 @@
-<h1>App: {{title}}</h1>
-
-<div *ngIf="this.user | async as user">
-    <h2>Olá {{user!.email}}!</h2>
-
-    Permissão: <b>{{user!.role || 'nada'}}</b>
-
-    <div *ngIf="user!.role === 'admin'">
-        <h2>{{this.text | async}}</h2>
-
-        <button (click)="generate()">Generate</button>
-    </div>
-</div>
-
-<app-login></app-login>
 <router-outlet></router-outlet>
