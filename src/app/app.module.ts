@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
+import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { environment } from '../environments/environment'
 
 import { ReactiveFormsModule } from '@angular/forms'
@@ -16,7 +17,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        DashboardComponent
     ],
     imports: [
         BrowserModule,
