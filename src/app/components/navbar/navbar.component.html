@@ -1,12 +1,12 @@
 <mat-toolbar color="primary" class="mat-elevation-z6">
     <nav class="flex-filling navbar-header">
-        <button mat-button *ngIf="!(isHandset$ | async)">My Application</button>
-        <button mat-button
+        <a mat-button *ngIf="!(isHandset$ | async)">My Application</a>
+        <a mat-button
             *ngFor="let route of routes"
             [routerLink]="route.route">
             {{ route.title }}
-        </button>
+        </a>
         <span class="flex-filling"></span>
-        <button mat-button>Login</button>
+        <a mat-stroked-button>Login</a>
     </nav>
 </mat-toolbar>
