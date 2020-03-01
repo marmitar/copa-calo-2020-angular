@@ -33,7 +33,7 @@ export class LoadingService {
         this.ref.attach(portal)
         const stop = () => this.stop()
 
-        if ('then' in action) {
+        if (action instanceof Promise) {
             return action.finally(stop)
 
         } else {
