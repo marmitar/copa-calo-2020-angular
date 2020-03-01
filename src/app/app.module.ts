@@ -3,12 +3,12 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { CommonModule } from '@angular/common'
 
-import { AppComponent } from './app.component'
-import { AppRoutingModule } from './app-routing.module'
-import { environment } from '../environments/environment'
+import { AppComponent } from '#/app.component'
+import { AppRoutingModule } from '#/app-routing.module'
+import { environment } from '##/environments/environment'
 
-import { NavbarComponent } from './components/navbar/navbar.component'
-import { LoginComponent, LoginDialogComponent } from './components/login/login.component'
+import { NavbarComponent } from '$/navbar/navbar.component'
+import { LoginComponent, LoginDialogComponent } from '$/login/login.component'
 
 import { ReactiveFormsModule } from '@angular/forms'
 import { AngularFireModule } from '@angular/fire'
@@ -17,6 +17,8 @@ import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFireFunctionsModule } from '@angular/fire/functions'
 
 import { LayoutModule } from '@angular/cdk/layout'
+import { OverlayModule } from '@angular/cdk/overlay'
+import { PortalModule } from '@angular/cdk/portal'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatButtonModule } from '@angular/material/button'
 import { MatSidenavModule } from '@angular/material/sidenav'
@@ -27,6 +29,8 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatRadioModule } from '@angular/material/radio'
 import { MatCardModule } from '@angular/material/card'
 import { MatDialogModule } from '@angular/material/dialog'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+
 
 @NgModule({
     declarations: [
@@ -46,6 +50,8 @@ import { MatDialogModule } from '@angular/material/dialog'
         AngularFireFunctionsModule,
         BrowserAnimationsModule,
         LayoutModule,
+        OverlayModule,
+        PortalModule,
         MatToolbarModule,
         MatButtonModule,
         MatSidenavModule,
@@ -55,7 +61,8 @@ import { MatDialogModule } from '@angular/material/dialog'
         MatSelectModule,
         MatRadioModule,
         MatCardModule,
-        MatDialogModule
+        MatDialogModule,
+        MatProgressSpinnerModule
     ],
     providers: [environment.functions],
     bootstrap: [AppComponent]

@@ -18,6 +18,20 @@
       "es2018",
       "dom"
     ],
+    "paths": {
+      "##/*": [
+        "src/*"
+      ],
+      "#/*": [
+        "src/app/*"
+      ],
+      "$/*": [
+        "src/app/components/*"
+      ],
+      "$$/*": [
+        "src/app/services/*"
+      ]
+    },
     "noUnusedLocals": true,
     "strictNullChecks": true,
     "removeComments": true,
