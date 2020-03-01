@@ -30,6 +30,7 @@ import { MatRadioModule } from '@angular/material/radio'
 import { MatCardModule } from '@angular/material/card'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatTabsModule } from '@angular/material/tabs'
 
 
 @NgModule({
@@ -62,7 +63,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
         MatRadioModule,
         MatCardModule,
         MatDialogModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        MatTabsModule
     ],
     providers: [environment.functions],
     bootstrap: [AppComponent]

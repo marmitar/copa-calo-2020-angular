@@ -2,12 +2,27 @@
   width: 100%;
 }
 
-.mat-radio-button {
-  display: block;
-  margin: 5px 0;
+.login-tabs {
+  height: 100%;
 }
 
 .login-form-input {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+
+  .flex-top-filling {
+    flex: 1 1 10%
+  }
+
+  .flex-filling {
+    flex: 1 1 50%
+  }
+}
+
+::ng-deep.mat-tab-link,
+::ng-deep.mat-tab-label,
+::ng-deep.mat-tab-label-active {
+  min-width: 60px!important;
 }

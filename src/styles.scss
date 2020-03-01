@@ -4,3 +4,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .flex-filling {
     flex: 1 1 auto
 }
+
+.login-tabs {
+    .mat-tab-body-wrapper {
+        height: 100%;
+    }
+}

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { FormBuilder, Validators } from '@angular/forms'
+import { FormGroup, FormBuilder, Validators } from '@angular/forms'
 import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { AngularFireAuth } from '@angular/fire/auth'
 
@@ -24,6 +24,7 @@ export class LoginComponent {
 
     open() {
         return this.matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
+            height: '360px',
             width: '320px'
         })
     }
@@ -41,10 +42,24 @@ export class LoginComponent {
 })
 export class LoginDialogComponent {
 
-    readonly form = this.fb.group({
-        email: [null, [Validators.required, Validators.email]],
-        password: [null, Validators.required]
-    })
+    readonly ctx = {
+        login: {
+            btn: 'Login',
+            submit: (form: FormGroup) => this.signIn(form.value),
+            form: this.fb.group({
+                email: [null, [Validators.required, Validators.email]],
+                password: [null, Validators.required]
+            })
+        },
+        signUp: {
+            btn: 'Registrar',
+            submit: (form: FormGroup) => this.signIn(form.value, true),
+            form: this.fb.group({
+                email: [null, [Validators.required, Validators.email]],
+                password: [null, [Validators.required, Validators.minLength(6)]]
+            })
+        }
+    }
 
     constructor(
         private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
@@ -53,11 +68,13 @@ export class LoginDialogComponent {
         private loading: LoadingService
     ) { }
 
-    async login() {
+    async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
+        const creds = signUp
+            ? this.auth.createUserWithEmailAndPassword(email, password)
+            : this.auth.signInWithEmailAndPassword(email, password)
+
         try {
-            const {email, password} = this.form.value
-            const signIn = this.auth.signInWithEmailAndPassword(email, password)
-            return await this.loading.runOn(signIn)
+            return await this.loading.runOn(creds)
 
         } catch (err) {
             console.log(typeof err)
