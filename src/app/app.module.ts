@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module'
 import { environment } from '../environments/environment'
 
 import { NavbarComponent } from './components/navbar/navbar.component'
+import { LoginComponent, LoginDialogComponent } from './components/login/login.component'
 
 import { ReactiveFormsModule } from '@angular/forms'
 import { AngularFireModule } from '@angular/fire'
@@ -21,12 +22,18 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatIconModule } from '@angular/material/icon'
 import { MatListModule } from '@angular/material/list'
-
+import { MatInputModule } from '@angular/material/input'
+import { MatSelectModule } from '@angular/material/select'
+import { MatRadioModule } from '@angular/material/radio'
+import { MatCardModule } from '@angular/material/card'
+import { MatDialogModule } from '@angular/material/dialog'
 
 @NgModule({
     declarations: [
         AppComponent,
-        NavbarComponent
+        NavbarComponent,
+        LoginComponent,
+        LoginDialogComponent
     ],
     imports: [
         BrowserModule,
@@ -43,7 +50,12 @@ import { MatListModule } from '@angular/material/list'
         MatButtonModule,
         MatSidenavModule,
         MatIconModule,
-        MatListModule
+        MatListModule,
+        MatInputModule,
+        MatSelectModule,
+        MatRadioModule,
+        MatCardModule,
+        MatDialogModule
     ],
     providers: [environment.functions],
     bootstrap: [AppComponent]

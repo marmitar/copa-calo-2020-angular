@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="login()">
+    <h1 mat-dialog-title>Login</h1>
+
+    <div mat-dialog-content class="login-form-input">
+        <mat-form-field class="flex-filling">
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" formControlName="email">
+        </mat-form-field>
+
+        <mat-form-field class="flex-filling">
+            <mat-label>Senha</mat-label>
+            <input matInput type="password" formControlName="password">
+        </mat-form-field>
+    </div>
+
+
+    <div mat-dialog-actions>
+        <button mat-button [mat-dialog-close]>Cancelar</button>
+        <button mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="!form.valid">
+            Login
+        </button>
+    </div>
+</form>
