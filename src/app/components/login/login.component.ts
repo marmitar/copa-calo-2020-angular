@@ -1,5 +1,5 @@
-import { Component } from '@angular/core'
-import { FormGroup, FormBuilder, Validators } from '@angular/forms'
+import { Component, EventEmitter } from '@angular/core'
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { AngularFireAuth } from '@angular/fire/auth'
 
@@ -61,6 +61,8 @@ export class LoginDialogComponent {
         }
     }
 
+    readonly error = new EventEmitter<string>(true)
+
     constructor(
         private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
         private fb: FormBuilder,
@@ -69,19 +71,37 @@ export class LoginDialogComponent {
     ) { }
 
     async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
-        const creds = signUp
+        const signingIn = signUp
             ? this.auth.createUserWithEmailAndPassword(email, password)
             : this.auth.signInWithEmailAndPassword(email, password)
 
         try {
-            return await this.loading.runOn(creds)
+            const creds = await this.loading.runOn(signingIn)
+            this.dialog.close()
+            return creds
 
         } catch (err) {
-            console.log(typeof err)
-            console.log(err)
+            if (err.message) {
+                this.error.emit(`${err.message}`)
+            } else {
+                this.error.emit(`${err}`)
+            }
+        }
+    }
 
-        } finally {
-            this.dialog.close()
+    getValidationError(form: FormControl): string {
+        if (form.hasError('required')) {
+            return 'Precisa de um valor'
+        } else if (form.hasError('email')) {
+            return 'Não é um e-mail válido'
+        } else {
+            const err = form.getError('minlength')
+            if (!err) {
+                return 'Entrada inválida'
+            }
+            const {requiredLength} = err
+
+            return `Tamanho mínimo é ${requiredLength}`
         }
     }
 

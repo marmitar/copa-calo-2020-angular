@@ -1,25 +1,36 @@
 <ng-template #loginForm let-submit="submit" let-btnText="btn" let-form="form">
-    <form [formGroup]="form" (ngSubmit)="submit()" class="login-form-input">
+    <form [formGroup]="form" (ngSubmit)="submit(form)" class="login-form-input">
 
         <span class="flex-top-filling"></span>
         <ng-container mat-dialog-content>
-            <mat-form-field class="flex-filling">
+            <mat-form-field class="flex-filling" hideRequiredMarker>
                 <mat-label>E-mail</mat-label>
-                <input matInput type="email" formControlName="email">
+                <input matInput type="email" formControlName="email" cdkFocusInitial required>
+                <mat-error *ngIf="form.controls.email.invalid">{{this.getValidationError(form.controls.email)}}</mat-error>
             </mat-form-field>
 
-            <mat-form-field class="flex-filling">
+            <mat-form-field class="flex-filling" hideRequiredMarker>
                 <mat-label>Senha</mat-label>
-                <input matInput type="password" formControlName="password">
+                <input matInput type="password" formControlName="password" required>
+                <mat-error *ngIf="form.controls.password.invalid">{{this.getValidationError(form.controls.password)}}</mat-error>
             </mat-form-field>
         </ng-container>
 
         <span class="flex-filling"></span>
+        <!-- <mat-card *ngIf="error | async as msg" class="login-warning mat-elevation-z4">
+            <mat-card-header>
+                <mat-card-title>Error</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                {{ msg }}
+            </mat-card-content>
+        </mat-card> -->
+
         <ng-container mat-dialog-actions>
             <button mat-raised-button
                 color="primary"
                 type="submit"
-                [disabled]="!form.valid">
+                [disabled]="form.invalid">
                     {{ btnText }}
             </button>
         </ng-container>
