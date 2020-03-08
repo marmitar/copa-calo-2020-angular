@@ -19,7 +19,8 @@ export class NavbarComponent {
         )
 
     readonly routes = [
-        { title: 'Test', route: "/test" }
+        { title: 'Test', route: '/test' },
+        { title: 'Admin', route: '/admin' }
     ]
 
   constructor(private breakpointObserver: BreakpointObserver) {}
