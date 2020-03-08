@@ -9,6 +9,7 @@ import { environment } from '##/environments/environment'
 
 import { NavbarComponent } from '$/navbar/navbar.component'
 import { LoginComponent, LoginDialogComponent } from '$/login/login.component'
+import { AdminComponent } from '$/admin/admin.component'
 
 import { ReactiveFormsModule } from '@angular/forms'
 import { AngularFireModule } from '@angular/fire'
@@ -39,7 +40,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar'
         AppComponent,
         NavbarComponent,
         LoginComponent,
-        LoginDialogComponent
+        LoginDialogComponent,
+        AdminComponent
     ],
     imports: [
         BrowserModule,
