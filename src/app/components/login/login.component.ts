@@ -8,6 +8,7 @@ import * as firebase from 'firebase'
 type UserCredental = firebase.auth.UserCredential
 
 import { LoadingService } from '$$/loading.service'
+import { MessagesService } from '$$/messages.service'
 
 
 @Component({
@@ -24,7 +25,7 @@ export class LoginComponent {
 
     open() {
         return this.matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
-            height: '360px',
+            height: '340px',
             width: '320px'
         })
     }
@@ -67,7 +68,8 @@ export class LoginDialogComponent {
         private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
         private fb: FormBuilder,
         private auth: AngularFireAuth,
-        private loading: LoadingService
+        private loading: LoadingService,
+        private messages: MessagesService
     ) { }
 
     async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
@@ -81,11 +83,28 @@ export class LoginDialogComponent {
             return creds
 
         } catch (err) {
-            if (err.message) {
-                this.error.emit(`${err.message}`)
-            } else {
-                this.error.emit(`${err}`)
-            }
+            const msg = this.signInErrorMessage(err)
+            this.messages.error.emit(msg)
+        }
+    }
+
+    signInErrorMessage(err: any): string {
+        switch (err.code) {
+            case 'auth/invalid-email':
+                return 'E-mail inválido'
+            case 'auth/user-disabled':
+                return 'Usuário desativado'
+            case 'auth/user-not-found':
+                return 'Usuário não encontrado'
+            case 'auth/wrong-password':
+                return 'Senha errada'
+            case 'auth/too-many-requests':
+                return 'Muitas tentativas erradas, espere um pouco'
+        }
+        if (err.message) {
+            return `${err.message}`
+        } else {
+            return `${err}`
         }
     }
 
@@ -104,16 +123,4 @@ export class LoginDialogComponent {
             return `Tamanho mínimo é ${requiredLength}`
         }
     }
-
-    // private async wait<T>(x: T, error?: boolean): Promise<T> {
-    //     return new Promise((resolve, reject) => {
-    //         setTimeout(() => {
-    //             if (error) {
-    //                 reject(x)
-    //             } else {
-    //                 // resolve(x)
-    //             }
-    //         }, 1500)
-    //     })
-    // }
 }

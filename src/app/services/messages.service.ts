@@ -26,8 +26,8 @@ export class MessagesService {
     constructor(private snackBar: MatSnackBar) { }
 
     eventSubscription() {
-        const error = this.error.pipe(defaultTo(3500, 'error'))
-        const hint = this.hint.pipe(defaultTo(2000, 'hint'))
+        const error = this.error.pipe(defaultTo(5000, 'error'))
+        const hint = this.hint.pipe(defaultTo(2500, 'hint'))
 
         return merge(error, hint).subscribe({
             next: data => {
