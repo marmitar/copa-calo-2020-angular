@@ -31,6 +31,7 @@ import { MatCardModule } from '@angular/material/card'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTabsModule } from '@angular/material/tabs'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 
 
 @NgModule({
@@ -64,7 +65,8 @@ import { MatTabsModule } from '@angular/material/tabs'
         MatCardModule,
         MatDialogModule,
         MatProgressSpinnerModule,
-        MatTabsModule
+        MatTabsModule,
+        MatSnackBarModule
     ],
     providers: [environment.functions],
     bootstrap: [AppComponent]
