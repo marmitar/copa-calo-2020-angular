@@ -100,6 +100,8 @@ export class LoginDialogComponent {
                 return 'Senha errada'
             case 'auth/too-many-requests':
                 return 'Muitas tentativas erradas, espere um pouco'
+            case 'auth/email-already-exists':
+                return 'E-mail já registrado'
         }
         if (err.message) {
             return `${err.message}`
