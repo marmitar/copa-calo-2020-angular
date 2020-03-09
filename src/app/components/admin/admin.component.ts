@@ -1,93 +1,137 @@
-import { Component } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { FormBuilder } from '@angular/forms'
+
+import { Observable, Subscription } from 'rxjs'
+import { map, tap, publishLast, refCount, retry, startWith, exhaustMap } from 'rxjs/operators'
+
+import { MessagesService } from '$$/messages.service'
+import { FunctionsService, User } from '$$/functions.service'
+
+
+interface Query {
+    email?: string,
+    users: User[]
+}
+
 
 @Component({
-  selector: 'app-admin',
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss']
+    selector: 'app-admin',
+    templateUrl: './admin.component.html',
+    styleUrls: ['./admin.component.scss']
 })
-export class AdminComponent {
-  addressForm = this.fb.group({
-    company: null,
-    firstName: [null, Validators.required],
-    lastName: [null, Validators.required],
-    address: [null, Validators.required],
-    address2: null,
-    city: [null, Validators.required],
-    state: [null, Validators.required],
-    postalCode: [null, Validators.compose([
-      Validators.required, Validators.minLength(5), Validators.maxLength(5)])
-    ],
-    shipping: ['free', Validators.required]
-  });
+export class AdminComponent implements OnInit, OnDestroy {
+    readonly form = this.fb.group({
+        email: [null],
+        password: [{value: null, disabled: true}],
+        role:[null],
+        team: [{value: null, disabled: true}]
+    })
 
-  hasUnitNumber = false;
+    private users$: Observable<User[]>
+    filteredEmails$: Observable<string[]>
+    teamDisable: Subscription
 
-  states = [
-    {name: 'Alabama', abbreviation: 'AL'},
-    {name: 'Alaska', abbreviation: 'AK'},
-    {name: 'American Samoa', abbreviation: 'AS'},
-    {name: 'Arizona', abbreviation: 'AZ'},
-    {name: 'Arkansas', abbreviation: 'AR'},
-    {name: 'California', abbreviation: 'CA'},
-    {name: 'Colorado', abbreviation: 'CO'},
-    {name: 'Connecticut', abbreviation: 'CT'},
-    {name: 'Delaware', abbreviation: 'DE'},
-    {name: 'District Of Columbia', abbreviation: 'DC'},
-    {name: 'Federated States Of Micronesia', abbreviation: 'FM'},
-    {name: 'Florida', abbreviation: 'FL'},
-    {name: 'Georgia', abbreviation: 'GA'},
-    {name: 'Guam', abbreviation: 'GU'},
-    {name: 'Hawaii', abbreviation: 'HI'},
-    {name: 'Idaho', abbreviation: 'ID'},
-    {name: 'Illinois', abbreviation: 'IL'},
-    {name: 'Indiana', abbreviation: 'IN'},
-    {name: 'Iowa', abbreviation: 'IA'},
-    {name: 'Kansas', abbreviation: 'KS'},
-    {name: 'Kentucky', abbreviation: 'KY'},
-    {name: 'Louisiana', abbreviation: 'LA'},
-    {name: 'Maine', abbreviation: 'ME'},
-    {name: 'Marshall Islands', abbreviation: 'MH'},
-    {name: 'Maryland', abbreviation: 'MD'},
-    {name: 'Massachusetts', abbreviation: 'MA'},
-    {name: 'Michigan', abbreviation: 'MI'},
-    {name: 'Minnesota', abbreviation: 'MN'},
-    {name: 'Mississippi', abbreviation: 'MS'},
-    {name: 'Missouri', abbreviation: 'MO'},
-    {name: 'Montana', abbreviation: 'MT'},
-    {name: 'Nebraska', abbreviation: 'NE'},
-    {name: 'Nevada', abbreviation: 'NV'},
-    {name: 'New Hampshire', abbreviation: 'NH'},
-    {name: 'New Jersey', abbreviation: 'NJ'},
-    {name: 'New Mexico', abbreviation: 'NM'},
-    {name: 'New York', abbreviation: 'NY'},
-    {name: 'North Carolina', abbreviation: 'NC'},
-    {name: 'North Dakota', abbreviation: 'ND'},
-    {name: 'Northern Mariana Islands', abbreviation: 'MP'},
-    {name: 'Ohio', abbreviation: 'OH'},
-    {name: 'Oklahoma', abbreviation: 'OK'},
-    {name: 'Oregon', abbreviation: 'OR'},
-    {name: 'Palau', abbreviation: 'PW'},
-    {name: 'Pennsylvania', abbreviation: 'PA'},
-    {name: 'Puerto Rico', abbreviation: 'PR'},
-    {name: 'Rhode Island', abbreviation: 'RI'},
-    {name: 'South Carolina', abbreviation: 'SC'},
-    {name: 'South Dakota', abbreviation: 'SD'},
-    {name: 'Tennessee', abbreviation: 'TN'},
-    {name: 'Texas', abbreviation: 'TX'},
-    {name: 'Utah', abbreviation: 'UT'},
-    {name: 'Vermont', abbreviation: 'VT'},
-    {name: 'Virgin Islands', abbreviation: 'VI'},
-    {name: 'Virginia', abbreviation: 'VA'},
-    {name: 'Washington', abbreviation: 'WA'},
-    {name: 'West Virginia', abbreviation: 'WV'},
-    {name: 'Wisconsin', abbreviation: 'WI'},
-    {name: 'Wyoming', abbreviation: 'WY'}
-  ];
+    constructor(
+        private fb: FormBuilder,
+        private msgs: MessagesService,
+        private fns: FunctionsService
+    ) {}
 
-  constructor(private fb: FormBuilder) {}
+    ngOnInit() {
+        this.users$ = this.fns.listAllUsers().pipe(
+            retry(2),
+            publishLast(),
+            refCount()
+        )
 
-  onSubmit() {
-    alert('Thanks!');
-  }
+        const emailFormVal = this.form.get('email')!.valueChanges as Observable<string>
+        this.filteredEmails$ = emailFormVal.pipe(
+            startWith(''),
+            exhaustMap(email => this.users$.pipe(
+                map(this.filterUsers(email))
+            )),
+            tap(query => {
+                if (query.users.length === 1 &&
+                    query.users[0].email.toLowerCase() === query.email) {
+
+                    this.setRole(query.users[0])
+                }
+            }),
+            map(query => query.users.map(user => user.email))
+        )
+
+        const roleFormVal = this.form.get('role')!.valueChanges
+        const teamFormCtrl = this.form.get('team')!
+        this.teamDisable = roleFormVal.pipe(
+            map(role => {
+                if (role === 'dm') {
+                    teamFormCtrl.enable({emitEvent: false})
+                } else {
+                    teamFormCtrl.disable({emitEvent: false})
+                }
+            })
+        ).subscribe()
+    }
+
+    ngOnDestroy() {
+        this.teamDisable.unsubscribe()
+    }
+
+    private filterUsers(email?: string): (users: User[]) => Query {
+        return users => {
+            if (email) {
+                const lower = email.toLowerCase()
+                return {
+                    email: lower,
+                    users: users.filter(user => user.email.toLowerCase().startsWith(lower))
+                }
+            } else {
+                return { email, users }
+            }
+        }
+    }
+
+    private setRole({role, team}: {role?: string, team?: string}) {
+        if (role) {
+            this.form.get('role')!.setValue(role)
+        }
+        if (team) {
+            this.form.get('team')!.setValue(team)
+        }
+    }
+
+    async genPasswd(): Promise<void> {
+        try {
+            const passwd = await this.fns.generatePassword().toPromise()
+            this.form.get('password')!.setValue(passwd)
+        } catch (err) {
+            this.emitError(err)
+        }
+    }
+
+    togglePasswd() {
+        const ctrl = this.form.get('password')!
+        if (ctrl.disabled) {
+            ctrl.enable()
+        } else {
+            ctrl.disable()
+        }
+    }
+
+    async submit() {
+        try {
+            const {email, password, role, team} = this.form.value
+            await this.fns.updateUser(email, password, {role, team}).toPromise()
+        } catch (err) {
+            this.emitError(err)
+        }
+    }
+
+    emitError(err: any) {
+        if (err.message) {
+            this.msgs.error.emit(`${err.message}`)
+        } else {
+            this.msgs.error.emit(`${err}`)
+        }
+    }
 }

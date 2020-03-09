@@ -33,6 +33,8 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatTabsModule } from '@angular/material/tabs'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatAutocompleteModule } from '@angular/material/autocomplete'
 
 
 @NgModule({
@@ -68,7 +70,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar'
         MatDialogModule,
         MatProgressSpinnerModule,
         MatTabsModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatSlideToggleModule,
+        MatAutocompleteModule
     ],
     providers: [environment.functions],
     bootstrap: [AppComponent]

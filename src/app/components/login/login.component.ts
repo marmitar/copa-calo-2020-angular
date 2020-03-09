@@ -62,7 +62,7 @@ export class LoginDialogComponent {
         }
     }
 
-    readonly error = new EventEmitter<string>(true)
+    readonly error = new EventEmitter<string>()
 
     constructor(
         private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
