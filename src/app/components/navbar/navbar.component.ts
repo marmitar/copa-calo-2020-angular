@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
-import { Observable } from 'rxjs'
+
 import { map, shareReplay } from 'rxjs/operators'
+import { FunctionsService } from '$$/functions.service'
 
 
 @Component({
@@ -11,18 +12,19 @@ import { map, shareReplay } from 'rxjs/operators'
 })
 export class NavbarComponent {
 
-    readonly isHandset$: Observable<boolean> = this.breakpointObserver
-        .observe(Breakpoints.Handset)
-        .pipe(
+    readonly isHandset$ = this.breakpoint
+        .observe(Breakpoints.Handset).pipe(
             map(result => result.matches),
             shareReplay()
         )
 
     readonly routes = [
         { title: 'Test', route: '/test' },
-        { title: 'Admin', route: '/admin' }
+        { title: 'Admin', route: '/admin', when: this.fns.isAdmin() }
     ]
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
-
+    constructor(
+        private breakpoint: BreakpointObserver,
+        private fns: FunctionsService
+    ) { }
 }

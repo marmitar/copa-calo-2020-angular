@@ -3,11 +3,13 @@
         <a mat-button *ngIf="!(isHandset$ | async)" routerLink="/">
             My Application
         </a>
-        <a mat-button
-            *ngFor="let route of routes"
-            [routerLink]="route.route">
-            {{ route.title }}
-        </a>
+
+        <ng-container *ngFor="let route of routes">
+            <a mat-button [routerLink]="route.route"
+                *ngIf="route.when === undefined || (route.when | async)">
+                    {{ route.title }}
+            </a>
+        </ng-container>
         <span class="flex-filling"></span>
         <app-login></app-login>
     </nav>

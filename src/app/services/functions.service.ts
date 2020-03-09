@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core'
 import { AngularFireFunctions } from '@angular/fire/functions'
 import { AngularFireAuth } from '@angular/fire/auth'
 
-import { Observable, OperatorFunction } from 'rxjs'
-import { exhaustMap, throwIfEmpty, first, filter } from 'rxjs/operators'
+import { Observable, OperatorFunction, of } from 'rxjs'
+import { exhaustMap, throwIfEmpty, first, filter, map } from 'rxjs/operators'
 
 import { customClaims } from '@angular/fire/auth-guard'
 
@@ -28,11 +28,30 @@ export class FunctionsService {
         private auth: AngularFireAuth
     ) { }
 
+    userRole(): Observable<Role> {
+        return this.auth.user.pipe(
+            exhaustMap(user => {
+                if (user === null) {
+                    return of({})
+
+                } else {
+                    return customClaims(of(user))
+                }
+            }),
+            map(claims => claims ?? {})
+        )
+    }
+
+    isAdmin(): Observable<boolean> {
+        return this.userRole().pipe(
+            map(claims => claims.role === 'admin')
+        )
+    }
 
     private requireRole<T>(role: Role): OperatorFunction<T, T> {
-        function match(claims: any) {
-            return claims.role === role.role
-                && (!role.team || claims.team === role.team)
+        function match(claims?: any) {
+            return claims?.role === role.role
+                && (!role.team || claims?.team === role.team)
         }
 
         return obs => this.auth.user.pipe(
