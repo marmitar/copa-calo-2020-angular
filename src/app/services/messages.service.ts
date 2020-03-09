@@ -1,5 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { environment } from '##/environments/environment'
 
 import { merge } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -18,8 +19,8 @@ export type Message = MessageData | MessageString
 })
 export class MessagesService {
 
-    readonly error = new EventEmitter<Message>(true)
-    readonly hint = new EventEmitter<Message>(true)
+    readonly error = new EventEmitter<Message>()
+    readonly hint = new EventEmitter<Message>()
 
     readonly opener = this.eventSubscription()
 
@@ -31,6 +32,9 @@ export class MessagesService {
 
         return merge(error, hint).subscribe({
             next: data => {
+                if (!environment.production) {
+                    console.log(data)
+                }
                 this.snackBar.open(data.message, 'Fechar', {
                     data: data.message,
                     duration: data.duration,
