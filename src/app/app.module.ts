@@ -10,6 +10,8 @@ import { environment } from '##/environments/environment'
 import { NavbarComponent } from '$/navbar/navbar.component'
 import { LoginComponent, LoginDialogComponent } from '$/login/login.component'
 import { AdminComponent } from '$/admin/admin.component'
+import { AdminUsersComponent } from '$/admin/users/users.component'
+import { AdminTeamsComponent } from '$/admin/teams/teams.component'
 
 import { ReactiveFormsModule } from '@angular/forms'
 import { AngularFireModule } from '@angular/fire'
@@ -43,7 +45,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete'
         NavbarComponent,
         LoginComponent,
         LoginDialogComponent,
-        AdminComponent
+        AdminComponent,
+        AdminUsersComponent,
+        AdminTeamsComponent
     ],
     imports: [
         BrowserModule,
