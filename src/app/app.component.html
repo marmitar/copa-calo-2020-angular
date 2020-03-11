@@ -1,4 +1,57 @@
-<app-navbar></app-navbar>
-<div class="app-router-outlet">
-    <router-outlet></router-outlet>
+<div class="app-container" [class.app-is-mobile]="mobile$ | async">
+    <ng-container *ngTemplateOutlet="navToolbar"></ng-container>
+
+    <mat-sidenav-container class="app-sidenav-container"
+                [style.marginTop.px]="(mobile$ | async)? 56 : 0">
+        <mat-sidenav #sideNav [mode]="(mobile$ | async)? 'over' : 'side'"
+                [fixedInViewport]="mobile$ | async" fixedTopGap="56">
+
+            <mat-nav-list>
+                <ng-container *ngTemplateOutlet="navRouterItems"></ng-container>
+            </mat-nav-list>
+        </mat-sidenav>
+
+        <mat-sidenav-content class="app-router-outlet">
+            <router-outlet></router-outlet>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
 </div>
+
+
+<ng-template #navRouterBtns>
+    <ng-container *ngFor="let route of routes">
+        <a mat-button [routerLink]="route.route" *ngIf="route | when">
+                {{ route.title }}
+        </a>
+    </ng-container>
+</ng-template>
+
+<ng-template #navRouterItems>
+    <ng-container *ngFor="let route of routes">
+        <a mat-list-item [routerLink]="route.route" *ngIf="route | when">
+                {{ route.title }}
+        </a>
+    </ng-container>
+</ng-template>
+
+
+<ng-template #navToolbar>
+    <mat-toolbar color="primary" class="mat-elevation-z6 app-toolbar">
+        <nav class="flex-filling navbar-header">
+            <button mat-icon-button *ngIf="mobile$ | async" (click)="sideNav.toggle()">
+                <mat-icon>menu</mat-icon>
+            </button>
+            <a mat-button routerLink="/">
+                {{ title }}
+            </a>
+            <mat-divider *ngIf="notMobile$ | async" [vertical]="true"></mat-divider>
+
+            <ng-container *ngIf="notMobile$ | async">
+                <ng-container *ngTemplateOutlet="navRouterBtns"></ng-container>
+            </ng-container>
+
+            <span class="flex-filling"></span>
+            <app-login></app-login>
+        </nav>
+    </mat-toolbar>
+</ng-template>

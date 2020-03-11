@@ -3,12 +3,11 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { CommonModule } from '@angular/common'
 
-import { AppComponent } from '#/app.component'
+import { AppComponent, WhennablePipe } from '#/app.component'
 import { AppRoutingModule } from '#/app-routing.module'
 import { environment } from '##/environments/environment'
 import { MatModule } from '#/mat.module'
 
-import { NavbarComponent } from '$/navbar/navbar.component'
 import { LoginComponent, LoginDialogComponent } from '$/login/login.component'
 import { AdminComponent } from '$/admin/admin.component'
 import { AdminUsersComponent } from '$/admin/users/users.component'
@@ -24,7 +23,7 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions'
 @NgModule({
     declarations: [
         AppComponent,
-        NavbarComponent,
+        WhennablePipe,
         LoginComponent,
         LoginDialogComponent,
         AdminComponent,
