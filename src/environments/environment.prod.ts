@@ -1,4 +1,8 @@
+import { environment as devel } from './environment'
+
+
 export const environment = {
     production: true,
-    functions: {}
+    firebase: devel.firebase,
+    providers: []
 }

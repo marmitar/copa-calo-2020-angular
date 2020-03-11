@@ -15,7 +15,9 @@ export const environment = {
         messagingSenderId: '663939319924',
         appId: '1:663939319924:web:3e1e8232663933b0c1e921'
     },
-    functions: { provide: ORIGIN, useValue: 'http://localhost:5000' }
+    providers: [
+        { provide: ORIGIN, useValue: 'http://localhost:5000' }
+    ]
 }
 
 /*
