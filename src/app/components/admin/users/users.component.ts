@@ -2,7 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 
 import { Observable, Subscription } from 'rxjs'
-import { map, tap, publishLast, refCount, retry, startWith, exhaustMap } from 'rxjs/operators'
+import {
+    map, tap, publishLast, refCount, delay,
+    startWith, exhaustMap, retryWhen, take
+} from 'rxjs/operators'
 
 import { MessagesService } from '$$/messages.service'
 import { FunctionsService, User } from '$$/functions.service'
@@ -39,7 +42,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.users$ = this.fns.listAllUsers().pipe(
-            retry(2),
+            retryWhen(errors => errors.pipe(delay(1000), take(2))),
             publishLast(),
             refCount()
         )

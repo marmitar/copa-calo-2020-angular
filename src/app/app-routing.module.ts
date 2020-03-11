@@ -13,7 +13,7 @@ const adminOnly = () => pipe(customClaims, map(claims => claims?.role === 'admin
 
 const routes: Routes = [
     { path: '', component: LoginComponent },
-    { path: 'admin', component: AdminComponent, ...canActivate(adminOnly)}
+    { path: 'admin', component: AdminComponent, ...canActivate(adminOnly) }
 ]
 
 @NgModule({
