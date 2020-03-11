@@ -1,8 +1,9 @@
-import { Component, EventEmitter } from '@angular/core'
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { AngularFireAuth } from '@angular/fire/auth'
 
+import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import * as firebase from 'firebase'
 type UserCredental = firebase.auth.UserCredential
@@ -16,12 +17,14 @@ import { MessagesService } from '$$/messages.service'
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
-    readonly unlogged = this._auth.user.pipe(
-        map(user => user === null)
-    )
+export class LoginComponent implements OnInit {
+    unlogged$: Observable<boolean>
 
     constructor(private _auth: AngularFireAuth, private _matDialog: MatDialog) {}
+
+    ngOnInit() {
+        this.unlogged$ = this._auth.user.pipe(map(user => user === null))
+    }
 
     open() {
         return this._matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
@@ -36,41 +39,56 @@ export class LoginComponent {
 }
 
 
+class Context {
+    readonly form: FormGroup
+    readonly email: FormControl
+    readonly password: FormControl
+    readonly submit: () => Promise<any>
+
+    constructor(
+        private parent: LoginDialogComponent,
+        private signUp: boolean,
+        readonly btn: string,
+        minLength?: number
+    ) {
+        this.email = new FormControl(null, [Validators.required, Validators.email])
+
+        let validators = [Validators.required]
+        if (minLength) {
+            validators.push(Validators.minLength(minLength))
+        }
+        this.password = new FormControl(null, validators)
+
+        this.form = new FormGroup({
+            email: this.email,
+            password: this.password
+        })
+
+        this.submit = () => this.parent.signIn(this.form.value, this.signUp)
+    }
+}
+
+
 @Component({
     selector: 'app-login-dialog',
     templateUrl: './login-dialog.component.html',
     styleUrls: ['./login.component.scss']
 })
-export class LoginDialogComponent {
-
-    readonly ctx = {
-        login: {
-            btn: 'Login',
-            submit: (form: FormGroup) => this.signIn(form.value),
-            form: this._fb.group({
-                email: [null, [Validators.required, Validators.email]],
-                password: [null, Validators.required]
-            })
-        },
-        signUp: {
-            btn: 'Registrar',
-            submit: (form: FormGroup) => this.signIn(form.value, true),
-            form: this._fb.group({
-                email: [null, [Validators.required, Validators.email]],
-                password: [null, [Validators.required, Validators.minLength(6)]]
-            })
-        }
-    }
-
-    readonly error = new EventEmitter<string>()
+export class LoginDialogComponent implements OnInit {
+    login: Context
+    signUp: Context
 
     constructor(
         private _dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
-        private _fb: FormBuilder,
         private _auth: AngularFireAuth,
         private _ldn: LoadingService,
         private _msgs: MessagesService
     ) { }
+
+    ngOnInit() {
+        this.login = new Context(this, false, 'Login')
+        this.signUp = new Context(this, true, 'Registrar', 6)
+    }
 
     async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
         const signingIn = signUp

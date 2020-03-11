@@ -20,7 +20,7 @@
 
 <ng-template #navRouterBtns>
     <ng-container *ngFor="let route of routes">
-        <a mat-button [routerLink]="route.route" *ngIf="route | when">
+        <a mat-button [routerLink]="route.route" *ngIf="route.when | async">
                 {{ route.title }}
         </a>
     </ng-container>
@@ -28,7 +28,7 @@
 
 <ng-template #navRouterItems>
     <ng-container *ngFor="let route of routes">
-        <a mat-list-item [routerLink]="route.route" *ngIf="route | when">
+        <a mat-list-item [routerLink]="route.route" *ngIf="route.when | async">
                 {{ route.title }}
         </a>
     </ng-container>
@@ -44,9 +44,9 @@
             <a mat-button routerLink="/">
                 {{ title }}
             </a>
-            <mat-divider *ngIf="notMobile$ | async" [vertical]="true"></mat-divider>
+            <mat-divider *ngIf="!(mobile$ | async)" [vertical]="true"></mat-divider>
 
-            <ng-container *ngIf="notMobile$ | async">
+            <ng-container *ngIf="!(mobile$ | async)">
                 <ng-container *ngTemplateOutlet="navRouterBtns"></ng-container>
             </ng-container>
 

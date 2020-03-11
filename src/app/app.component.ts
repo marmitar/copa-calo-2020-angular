@@ -1,9 +1,14 @@
-import { Component, Pipe, PipeTransform, ChangeDetectorRef, OnDestroy } from '@angular/core'
-import { AsyncPipe } from '@angular/common'
+import { Component, OnInit } from '@angular/core'
 
 import { ObserversService } from '$$/observers.service'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+
+
+export interface Route {
+    title: string
+    route: string
+    when: Observable<boolean>
+}
 
 
 @Component({
@@ -11,46 +16,22 @@ import { map } from 'rxjs/operators'
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     readonly title = 'Competição'
 
-    readonly routes = [
-        { title: 'Test', route: '/test' },
-        { title: 'Admin', route: '/admin', when: this._obs.isAdmin$ }
-    ]
-
-    readonly mobile$ = this._obs.isHPortrait$
-    readonly notMobile$ = this.mobile$.pipe(map(val => ! val))
+    routes: Route[]
+    mobile$: Observable<boolean>
 
     constructor(
         private _obs: ObserversService
     ) { }
-}
 
+    ngOnInit() {
+        this.routes = [
+            { title: 'Test', route: '/test', when: of(true) },
+            { title: 'Admin', route: '/admin', when: this._obs.isAdmin$ }
+        ]
 
-interface Whennable {
-    when?: boolean | Observable<boolean>
-}
-
-
-@Pipe({name: 'when', pure: false})
-export class WhennablePipe implements PipeTransform, OnDestroy {
-    private _async = new AsyncPipe(this._ref)
-
-    constructor(private _ref: ChangeDetectorRef) {}
-
-    ngOnDestroy() {
-        this._async.ngOnDestroy()
-    }
-
-    transform({when}: Whennable): boolean {
-        switch (typeof when) {
-            case 'boolean':
-                return when
-            case 'undefined':
-                return true
-            default:
-                return this._async.transform(when)!
-        }
+        this.mobile$ = this._obs.isHPortrait$
     }
 }

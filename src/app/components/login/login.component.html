@@ -1,5 +1,5 @@
 <button mat-flat-button
-    *ngIf="unlogged | async; else logoutBtn"
+    *ngIf="unlogged$ | async; else logoutBtn"
     (click)="open()">
     Login
 </button>

@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { CommonModule } from '@angular/common'
 
-import { AppComponent, WhennablePipe } from '#/app.component'
+import { AppComponent } from '#/app.component'
 import { AppRoutingModule } from '#/app-routing.module'
 import { environment } from '##/environments/environment'
 import { MatModule } from '#/mat.module'
@@ -12,6 +12,7 @@ import { LoginComponent, LoginDialogComponent } from '$/login/login.component'
 import { AdminComponent } from '$/admin/admin.component'
 import { AdminUsersComponent } from '$/admin/users/users.component'
 import { AdminTeamsComponent } from '$/admin/teams/teams.component'
+import { AthletesCreateComponent } from '$/athletes/create/create.component'
 
 import { ReactiveFormsModule } from '@angular/forms'
 import { AngularFireModule } from '@angular/fire'
@@ -23,12 +24,12 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions'
 @NgModule({
     declarations: [
         AppComponent,
-        WhennablePipe,
         LoginComponent,
         LoginDialogComponent,
         AdminComponent,
         AdminUsersComponent,
-        AdminTeamsComponent
+        AdminTeamsComponent,
+        AthletesCreateComponent
     ],
     imports: [
         BrowserModule,

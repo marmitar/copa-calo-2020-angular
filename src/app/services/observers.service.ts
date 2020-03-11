@@ -5,7 +5,7 @@ import { AngularFireAuth } from '@angular/fire/auth'
 import { of, OperatorFunction } from 'rxjs'
 import {
     pluck, shareReplay, exhaustMap,
-    map, first, filter, throwIfEmpty
+    map, first, filter, throwIfEmpty, startWith
 } from 'rxjs/operators'
 
 
@@ -39,6 +39,7 @@ export class ObserversService {
     )
 
     readonly user$ = this._auth.user.pipe(
+        startWith(null),
         exhaustMap(user => {
             if (user !== null && user !== undefined) {
                 return user.getIdTokenResult().then<Role>(

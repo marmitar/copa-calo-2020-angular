@@ -33,13 +33,13 @@
 <mat-tab-group mat-stretch-tabs class="login-tabs">
     <mat-tab label="Login">
         <ng-container
-            *ngTemplateOutlet="loginForm;context:ctx.login">
+            *ngTemplateOutlet="loginForm;context:login">
         </ng-container>
     </mat-tab>
 
     <mat-tab label="Registrar">
         <ng-container
-            *ngTemplateOutlet="loginForm;context:ctx.signUp">
+            *ngTemplateOutlet="loginForm;context:signUp">
         </ng-container>
     </mat-tab>
 </mat-tab-group>

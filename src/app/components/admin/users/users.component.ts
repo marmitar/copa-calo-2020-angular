@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
-import { FormBuilder } from '@angular/forms'
+import { FormBuilder, FormGroup } from '@angular/forms'
 
 import { Observable, Subscription } from 'rxjs'
 import {
@@ -23,16 +23,12 @@ interface Query {
     styleUrls: ['./users.component.scss']
 })
 export class AdminUsersComponent implements OnInit, OnDestroy {
-    readonly form = this._fb.group({
-        email: [null],
-        password: [{value: null, disabled: true}],
-        role:[null],
-        team: [{value: null, disabled: true}]
-    })
 
     private _users$: Observable<User[]>
+    private _autoTeamDisable: Subscription
+
     filteredEmails$: Observable<string[]>
-    teamDisable: Subscription
+    form: FormGroup
 
     constructor(
         private _fb: FormBuilder,
@@ -41,12 +37,24 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
+        this.form = this._fb.group({
+            email: [null],
+            password: [{value: null, disabled: true}],
+            role:[null],
+            team: [{value: null, disabled: true}]
+        })
+
         this._users$ = this._fns.listAllUsers().pipe(
             retryWhen(errors => errors.pipe(delay(1000), take(2))),
             publishLast(),
             refCount()
         )
 
+        this._buildFilteredEmails()
+        this._buildAutoTeamDisable()
+    }
+
+    private _buildFilteredEmails() {
         const emailFormVal = this.form.get('email')!.valueChanges as Observable<string>
         this.filteredEmails$ = emailFormVal.pipe(
             startWith(''),
@@ -62,10 +70,13 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
             }),
             map(query => query.users.map(user => user.email))
         )
+    }
 
+    private _buildAutoTeamDisable() {
         const roleFormVal = this.form.get('role')!.valueChanges
         const teamFormCtrl = this.form.get('team')!
-        this.teamDisable = roleFormVal.pipe(
+
+        this._autoTeamDisable = roleFormVal.pipe(
             map(role => {
                 if (role === 'dm') {
                     teamFormCtrl.enable({emitEvent: false})
@@ -77,7 +88,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.teamDisable.unsubscribe()
+        this._autoTeamDisable.unsubscribe()
     }
 
     private _filterUsers(email?: string): (users: User[]) => Query {
