@@ -1,1 +1,33 @@
-<app-admin-users></app-admin-users>
+<mat-accordion>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Usuários
+            </mat-panel-title>
+            <mat-panel-description>
+                Criar ou alterar usuários
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <ng-template matExpansionPanelContent>
+            <app-admin-users></app-admin-users>
+        </ng-template>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Equipes
+            </mat-panel-title>
+            <mat-panel-description>
+                Criar ou alterar equipes
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <ng-template matExpansionPanelContent>
+            <app-admin-teams></app-admin-teams>
+        </ng-template>
+    </mat-expansion-panel>
+
+</mat-accordion>
