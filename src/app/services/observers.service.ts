@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
-import { AngularFireAuth } from '@angular/fire/auth/auth'
+import { AngularFireAuth } from '@angular/fire/auth'
 
 import { of, OperatorFunction } from 'rxjs'
 import {
