@@ -17,21 +17,21 @@ import { MessagesService } from '$$/messages.service'
     styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-    readonly unlogged = this.auth.user.pipe(
+    readonly unlogged = this._auth.user.pipe(
         map(user => user === null)
     )
 
-    constructor(private auth: AngularFireAuth, private matDialog: MatDialog) {}
+    constructor(private _auth: AngularFireAuth, private _matDialog: MatDialog) {}
 
     open() {
-        return this.matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
+        return this._matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
             height: '340px',
             width: '320px'
         })
     }
 
     async logout() {
-        await this.auth.signOut()
+        await this._auth.signOut()
     }
 }
 
@@ -47,7 +47,7 @@ export class LoginDialogComponent {
         login: {
             btn: 'Login',
             submit: (form: FormGroup) => this.signIn(form.value),
-            form: this.fb.group({
+            form: this._fb.group({
                 email: [null, [Validators.required, Validators.email]],
                 password: [null, Validators.required]
             })
@@ -55,7 +55,7 @@ export class LoginDialogComponent {
         signUp: {
             btn: 'Registrar',
             submit: (form: FormGroup) => this.signIn(form.value, true),
-            form: this.fb.group({
+            form: this._fb.group({
                 email: [null, [Validators.required, Validators.email]],
                 password: [null, [Validators.required, Validators.minLength(6)]]
             })
@@ -65,26 +65,26 @@ export class LoginDialogComponent {
     readonly error = new EventEmitter<string>()
 
     constructor(
-        private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
-        private fb: FormBuilder,
-        private auth: AngularFireAuth,
-        private loading: LoadingService,
-        private messages: MessagesService
+        private _dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
+        private _fb: FormBuilder,
+        private _auth: AngularFireAuth,
+        private _ldn: LoadingService,
+        private _msgs: MessagesService
     ) { }
 
     async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
         const signingIn = signUp
-            ? this.auth.createUserWithEmailAndPassword(email, password)
-            : this.auth.signInWithEmailAndPassword(email, password)
+            ? this._auth.createUserWithEmailAndPassword(email, password)
+            : this._auth.signInWithEmailAndPassword(email, password)
 
         try {
-            const creds = await this.loading.runOn(signingIn)
-            this.dialog.close()
+            const creds = await this._ldn.runOn(signingIn)
+            this._dialog.close()
             return creds
 
         } catch (err) {
             const msg = this.signInErrorMessage(err)
-            this.messages.error.emit(msg)
+            this._msgs.error.emit(msg)
         }
     }
 

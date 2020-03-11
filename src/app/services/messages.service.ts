@@ -24,7 +24,7 @@ export class MessagesService {
 
     readonly opener = this.eventSubscription()
 
-    constructor(private snackBar: MatSnackBar) { }
+    constructor(private _snackBar: MatSnackBar) { }
 
     eventSubscription() {
         const error = this.error.pipe(defaultTo(5000, 'error'))
@@ -35,7 +35,7 @@ export class MessagesService {
                 if (!environment.production) {
                     console.log(data)
                 }
-                this.snackBar.open(data.message, 'Fechar', {
+                this._snackBar.open(data.message, 'Fechar', {
                     data: data.message,
                     duration: data.duration,
                     panelClass: [

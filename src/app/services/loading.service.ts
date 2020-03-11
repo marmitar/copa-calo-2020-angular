@@ -11,15 +11,15 @@ import { tap } from 'rxjs/operators'
     providedIn: 'root'
 })
 export class LoadingService {
-    private ref = this.create()
+    private _ref = this.create()
 
-    constructor(private overlay: Overlay) { }
+    constructor(private _overlay: Overlay) { }
 
     private create() {
-        return this.overlay.create({
+        return this._overlay.create({
             hasBackdrop: true,
             backdropClass: 'dark-backdrop',
-            positionStrategy: this.overlay.position()
+            positionStrategy: this._overlay.position()
                 .global()
                 .centerHorizontally()
                 .centerVertically()
@@ -30,8 +30,8 @@ export class LoadingService {
     runOn<T>(action: Observable<T>, onlyFinished?: boolean): Observable<T>
     runOn<T>(action: Promise<T> | Observable<T>, onlyFinished?: boolean): Promise<T> | Observable<T> {
         const portal = new ComponentPortal(MatSpinner)
-        this.ref.attach(portal)
-        const stop = () => this.stop()
+        this._ref.attach(portal)
+        const stop = () => this._stop()
 
         if (action instanceof Promise) {
             return action.finally(stop)
@@ -42,7 +42,7 @@ export class LoadingService {
         }
     }
 
-    private stop() {
-        this.ref.detach()
+    private _stop() {
+        this._ref.detach()
     }
 }

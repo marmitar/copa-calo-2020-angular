@@ -24,21 +24,21 @@ export type Role = {
 export class ObserversService {
 
     constructor(
-        private bpObserver: BreakpointObserver,
-        private auth: AngularFireAuth
+        private _bpObserver: BreakpointObserver,
+        private _auth: AngularFireAuth
     ) { }
 
-    readonly isHandset$ = this.bpObserver.observe(Breakpoints.Handset).pipe(
+    readonly isHandset$ = this._bpObserver.observe(Breakpoints.Handset).pipe(
         pluck('matches'),
         shareReplay(1)
     )
 
-    readonly isHPortrait$ = this.bpObserver.observe(Breakpoints.HandsetPortrait).pipe(
+    readonly isHPortrait$ = this._bpObserver.observe(Breakpoints.HandsetPortrait).pipe(
         pluck('matches'),
         shareReplay(1)
     )
 
-    readonly user$ = this.auth.user.pipe(
+    readonly user$ = this._auth.user.pipe(
         exhaustMap(user => {
             if (user !== null && user !== undefined) {
                 return user.getIdTokenResult().then<Role>(

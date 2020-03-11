@@ -13,22 +13,22 @@ export type User = Role & {email: string}
 export class FunctionsService {
 
     constructor(
-        private fns: AngularFireFunctions,
-        private obs: ObserversService
+        private _fns: AngularFireFunctions,
+        private _obs: ObserversService
     ) { }
 
     generatePassword(): Observable<string> {
-        const func = this.fns.httpsCallable('generatePassword')
-        return func(null).pipe(this.obs.requireRole({role: 'admin'}))
+        const func = this._fns.httpsCallable('generatePassword')
+        return func(null).pipe(this._obs.requireRole({role: 'admin'}))
     }
 
     updateUser(email: string, password?: string, role?: Role): Observable<void> {
-        const func = this.fns.httpsCallable('updateUser')
-        return func({email, password, role}).pipe(this.obs.requireRole({role: 'admin'}))
+        const func = this._fns.httpsCallable('updateUser')
+        return func({email, password, role}).pipe(this._obs.requireRole({role: 'admin'}))
     }
 
     listAllUsers(): Observable<User[]> {
-        const func = this.fns.httpsCallable('listAllUsers')
-        return func(null).pipe(this.obs.requireRole({role: 'admin'}))
+        const func = this._fns.httpsCallable('listAllUsers')
+        return func(null).pipe(this._obs.requireRole({role: 'admin'}))
     }
 }
