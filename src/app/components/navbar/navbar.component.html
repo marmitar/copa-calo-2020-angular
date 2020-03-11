@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="mat-elevation-z6">
     <nav class="flex-filling navbar-header">
-        <a mat-button *ngIf="!(isHandset$ | async)" routerLink="/">
+        <a mat-button *ngIf="!(obs.isHandset$ | async)" routerLink="/">
             My Application
         </a>
 
