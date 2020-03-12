@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core'
+
+import { Observable } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 
+import { AngularFireStorage } from '@angular/fire/storage'
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore'
 import 'firebase/firestore'
 
@@ -24,10 +27,17 @@ export class CollectionsService {
     )
 
     constructor(
-        private _store: AngularFirestore
+        private _store: AngularFirestore,
+        private _storage: AngularFireStorage
     ) { }
 
     team(initials: string) {
         return this._teamsCol.doc<Team>(initials)
+    }
+
+    logoUrl(initials: string): Observable<string> {
+        return this._storage.ref(`teams/${initials}`).getDownloadURL().pipe(
+            shareReplay(1)
+        )
     }
 }
