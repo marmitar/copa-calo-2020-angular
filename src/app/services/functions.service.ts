@@ -18,13 +18,11 @@ export class FunctionsService {
     ) { }
 
     generatePassword(): Observable<string> {
-        const func = this._fns.httpsCallable('generatePassword')
-        return func(null).pipe(this._obs.requireRole({role: 'admin'}))
+        return this._fns.httpsCallable('generatePassword')(null)
     }
 
     updateUser(email: string, password?: string, role?: Role): Observable<void> {
-        const func = this._fns.httpsCallable('updateUser')
-        return func({email, password, role}).pipe(this._obs.requireRole({role: 'admin'}))
+        return this._fns.httpsCallable('updateUser')({email, password, role})
     }
 
     listAllUsers(): Observable<User[]> {
