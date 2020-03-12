@@ -1,1 +1,24 @@
-<p>teams works!</p>
+<form [formGroup]="form" novalidate class="admin-form" (ngSubmit)="create()">
+
+    <mat-form-field class="full-width">
+        <mat-label>Nome</mat-label>
+        <input matInput type="text" formControlName="name">
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <mat-label>Sigla</mat-label>
+        <input matInput type="text" formControlName="init">
+    </mat-form-field>
+
+    <button mat-raised-button (click)="logoFile.click()" type="button" class="full-width">
+        Logo
+        <input hidden #logoFile type="file" (change)="logo = $event.target.files[0]">
+    </button>
+    <div class="admin-form-space"></div>
+
+    <div class="full-width admin-form-actions">
+        <button mat-flat-button color="warn" (click)="this.delete()" type="button">Deletar</button>
+        <span class="flex-filling"></span>
+        <button mat-flat-button color="accent" type="submit">Atualizar Equipe</button>
+    </div>
+</form>
