@@ -102,7 +102,7 @@ export class LoginDialogComponent implements OnInit {
 
         } catch (err) {
             const msg = this.signInErrorMessage(err)
-            this._msgs.error.emit(msg)
+            this._msgs.error(msg, err)
         }
     }
 
@@ -139,7 +139,6 @@ export class LoginDialogComponent implements OnInit {
                 return 'Entrada inválida'
             }
             const {requiredLength} = err
-
             return `Tamanho mínimo é ${requiredLength}`
         }
     }
