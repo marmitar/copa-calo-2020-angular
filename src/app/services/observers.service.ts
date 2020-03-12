@@ -52,21 +52,17 @@ export class ObserversService {
         shareReplay(1)
     )
 
-    readonly isAdmin$ = this.hasRole({role: 'admin'})
+    readonly isAdmin$ = this.hasRole('admin')
 
-    hasRole(role: Role) {
-        function match(claims?: Role | null) {
-            return claims?.role === role.role
-                && (!role.team || claims?.team === role.team)
-        }
-
-        return this.user$.pipe(map(match))
+    hasRole(role?: string, team?: string) {
+        return this.user$.pipe(map(claims => {
+            return claims?.role === role
+                && (team === undefined || claims?.team === team)
+        }))
     }
 
-    requireRole<T>(role: Role): OperatorFunction<T, T> {
-        const msg = 'Usuário não tem permissão para isso'
-
-        return obs => this.hasRole(role).pipe(
+    requireRole<T>({role, team}: Role): OperatorFunction<T, T> {
+        return obs => this.hasRole(role, team).pipe(
             first(),
             filter(hasRole => hasRole),
             throwIfEmpty(() => new Error(msg)),
@@ -74,3 +70,5 @@ export class ObserversService {
         )
     }
 }
+
+const msg = 'Usuário não tem permissão para isso'

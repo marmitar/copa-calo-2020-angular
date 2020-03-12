@@ -9,6 +9,7 @@ import {
 
 import { MessagesService } from '$$/messages.service'
 import { FunctionsService, User } from '$$/functions.service'
+import { LoadingService } from '$$/loading.service'
 
 
 interface Query {
@@ -33,7 +34,8 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     constructor(
         private _fb: FormBuilder,
         private _msgs: MessagesService,
-        private _fns: FunctionsService
+        private _fns: FunctionsService,
+        private _ldn: LoadingService
     ) {}
 
     ngOnInit() {
@@ -136,8 +138,10 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
         try {
 			const {email, passwordVal, role, teamVal} = this.form.value
 			const password = this.form.get('password')!.enabled ? passwordVal : undefined
-			const team = this.form.get('team')!.enabled ? teamVal : undefined
-            await this._fns.updateUser(email, password, {role, team}).toPromise()
+            const team = this.form.get('team')!.enabled ? teamVal : undefined
+            const ans = this._fns.updateUser(email, password, {role, team})
+            await this._ldn.runOn(ans.toPromise())
+            this._msgs.hint('Usuário atualizado ou criado')
         } catch (err) {
             this.emitError(err)
         }
@@ -145,9 +149,9 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
     emitError(err: any) {
         if (err.message) {
-            this._msgs.error.emit(`${err.message}`)
+            this._msgs.error(`${err.message}`, err)
         } else {
-            this._msgs.error.emit(`${err}`)
+            this._msgs.error(`${err}`, err)
         }
     }
 }
