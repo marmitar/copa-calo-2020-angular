@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 
 import { Observable, Subscription } from 'rxjs'
 import {
-    map, tap, publishLast, refCount, delay,
-    startWith, exhaustMap, retryWhen, take
+    map, tap, delay, startWith, exhaustMap,
+    retryWhen, take, shareReplay
 } from 'rxjs/operators'
 
 import { MessagesService } from '$$/messages.service'
@@ -48,8 +48,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
         this._users$ = this._fns.listAllUsers().pipe(
             retryWhen(errors => errors.pipe(delay(1000), take(2))),
-            publishLast(),
-            refCount()
+            shareReplay(1)
         )
 
         this._buildFilteredEmails()
