@@ -21,7 +21,7 @@ interface Query {
 @Component({
     selector: 'app-admin-users',
     templateUrl: './users.component.html',
-    styleUrls: ['./users.component.scss']
+    styleUrls: ['../admin.component.scss']
 })
 export class AdminUsersComponent implements OnInit, OnDestroy {
 
