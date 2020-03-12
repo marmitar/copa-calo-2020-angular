@@ -19,6 +19,7 @@ import { AngularFireModule } from '@angular/fire'
 import { AngularFireAuthModule } from '@angular/fire/auth'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFireFunctionsModule } from '@angular/fire/functions'
+import { AngularFireStorageModule } from '@angular/fire/storage'
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions'
         AngularFireAuthModule,
         AngularFirestoreModule,
         AngularFireFunctionsModule,
+        AngularFireStorageModule,
         BrowserAnimationsModule,
         MatModule
     ],
