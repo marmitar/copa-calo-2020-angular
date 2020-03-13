@@ -3,14 +3,14 @@ import { Injectable } from '@angular/core'
 import { Observable, combineLatest } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 
-import { AngularFireStorage } from '@angular/fire/storage'
 import { AngularFirestore } from '@angular/fire/firestore'
 import 'firebase/firestore'
 
 
 export interface Team {
     name: string,
-    initials: string
+    initials: string,
+    logoUrl: string
 }
 
 export interface TeamsByInitials {
@@ -57,19 +57,10 @@ export class CollectionsService {
         }))
     )
 
-    constructor(
-        private firestore: AngularFirestore,
-        private storage: AngularFireStorage
-    ) { }
+    constructor(private firestore: AngularFirestore) { }
 
     team(initials: string) {
         return this.teamsCol.doc<Team>(initials)
-    }
-
-    logoUrl(initials: string): Observable<string> {
-        return this.storage.ref(`teams/${initials}`).getDownloadURL().pipe(
-            shareReplay(1)
-        )
     }
 
     async addAthlete(athlete: Athlete) {

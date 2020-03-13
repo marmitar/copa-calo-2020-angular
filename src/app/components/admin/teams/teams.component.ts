@@ -29,13 +29,15 @@ export class AdminTeamsComponent {
         private storage: AngularFireStorage
     ) { }
 
-    async create() {
-        const {name, init} = this.form.value
-        try {
-            const task = this.storage.ref(`/teams/${init}`).put(this.logo)
-            const creation = this.cols.team(init).set({ name, initials: init })
-            await this.ldn.runOn(Promise.all([task.then(), creation]))
+    private async createWith(name: string, initials: string) {
+        const photo = await this.storage.ref(`/teams/${initials}`).put(this.logo)
+        await this.cols.team(initials).set({ name, initials, logoUrl: photo.downloadURL! })
+    }
 
+    async create() {
+        try {
+            const {name, init} = this.form.value
+            await this.ldn.runOn(this.createWith(name, init))
             this.msgs.hint(`Equipe ${name} criada`)
         } catch (err) {
             await this.delete(false)
