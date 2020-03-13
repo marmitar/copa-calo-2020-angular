@@ -20,21 +20,17 @@ import { MessagesService } from '$$/messages.service'
 export class LoginComponent implements OnInit {
     unlogged$: Observable<boolean>
 
-    constructor(private _auth: AngularFireAuth, private _matDialog: MatDialog) {}
+    constructor(public auth: AngularFireAuth, private matDialog: MatDialog) {}
 
     ngOnInit() {
-        this.unlogged$ = this._auth.user.pipe(map(user => user === null))
+        this.unlogged$ = this.auth.user.pipe(map(user => user === null))
     }
 
     open() {
-        return this._matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
+        return this.matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
             height: '340px',
             width: '320px'
         })
-    }
-
-    async logout() {
-        await this._auth.signOut()
     }
 }
 
@@ -79,10 +75,10 @@ export class LoginDialogComponent implements OnInit {
     signUp: Context
 
     constructor(
-        private _dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
-        private _auth: AngularFireAuth,
-        private _ldn: LoadingService,
-        private _msgs: MessagesService
+        private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
+        private auth: AngularFireAuth,
+        private ldn: LoadingService,
+        private msgs: MessagesService
     ) { }
 
     ngOnInit() {
@@ -91,18 +87,18 @@ export class LoginDialogComponent implements OnInit {
     }
 
     async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
-        const signingIn = signUp
-            ? this._auth.createUserWithEmailAndPassword(email, password)
-            : this._auth.signInWithEmailAndPassword(email, password)
+        const signingIn = signUp ?
+            this.auth.createUserWithEmailAndPassword(email, password)
+            : this.auth.signInWithEmailAndPassword(email, password)
 
         try {
-            const creds = await this._ldn.runOn(signingIn)
-            this._dialog.close()
+            const creds = await this.ldn.runOn(signingIn)
+            this.dialog.close()
             return creds
 
         } catch (err) {
             const msg = this.signInErrorMessage(err)
-            this._msgs.error(msg, err)
+            this.msgs.error(msg, err)
         }
     }
 
@@ -120,11 +116,8 @@ export class LoginDialogComponent implements OnInit {
                 return 'Muitas tentativas erradas, espere um pouco'
             case 'auth/email-already-exists':
                 return 'E-mail já registrado'
-        }
-        if (err.message) {
-            return `${err.message}`
-        } else {
-            return `${err}`
+            default:
+                return `${err.message ?? err}`
         }
     }
 
@@ -138,8 +131,7 @@ export class LoginDialogComponent implements OnInit {
             if (!err) {
                 return 'Entrada inválida'
             }
-            const {requiredLength} = err
-            return `Tamanho mínimo é ${requiredLength}`
+            return `Tamanho mínimo é ${err.requiredLength}`
         }
     }
 }
