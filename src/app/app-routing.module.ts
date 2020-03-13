@@ -6,13 +6,13 @@ import { pipe } from 'rxjs'
 import { map } from 'rxjs/operators'
 
 import { AdminComponent } from '$/admin/admin.component'
-import { LoginComponent } from '$/login/login.component'
+import { AthletesCreateComponent } from '$/athletes/create/create.component'
 
 
 const adminOnly = () => pipe(customClaims, map(claims => claims?.role === 'admin'))
 
 const routes: Routes = [
-    { path: '', component: LoginComponent },
+    { path: '', component: AthletesCreateComponent },
     { path: 'admin', component: AdminComponent, ...canActivate(adminOnly) }
 ]
 
