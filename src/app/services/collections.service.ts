@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core'
 
-import { Observable } from 'rxjs'
+import { Observable, combineLatest } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 
 import { AngularFireStorage } from '@angular/fire/storage'
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore'
+import { AngularFirestore } from '@angular/fire/firestore'
 import 'firebase/firestore'
 
 
@@ -13,31 +13,69 @@ export interface Team {
     initials: string
 }
 
+export interface TeamsByInitials {
+    [intials: string]: Team
+}
+
+export const enum Sex {
+    FEM = "feminino",
+    MASC = "masculino"
+}
+
+export interface Athlete {
+    name: string
+    rg: string
+    rgOrgao: string
+
+    sex: Sex
+    team: Team['initials'] | Team
+}
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class CollectionsService {
 
-    private _teamsCol = this._store.collection('/teams') as AngularFirestoreCollection<Team>
+    private teamsCol = this.firestore.collection<Team>('/teams')
+    private atlCol = this.firestore.collection<Athlete>('/athletes')
 
-    readonly teams$ = this._teamsCol.get().pipe(
+    readonly teams$ = this.teamsCol.get().pipe(
         map(teams => teams.docs.map(doc => doc.data() as Team)),
         shareReplay(1)
     )
+    readonly teamByInitial$: Observable<TeamsByInitials> = this.teams$.pipe(
+        map(teams => teams.reduce((obj, team) => {
+            obj[team.initials] = team
+            return obj
+        }, {}))
+    )
+    readonly athletes$ = combineLatest(this.teamByInitial$, this.atlCol.valueChanges()).pipe(
+        map(([teams, atls]) => atls.map(atl => {
+            atl.team = teams[atl.team as string]
+            return atl
+        }))
+    )
 
     constructor(
-        private _store: AngularFirestore,
-        private _storage: AngularFireStorage
+        private firestore: AngularFirestore,
+        private storage: AngularFireStorage
     ) { }
 
     team(initials: string) {
-        return this._teamsCol.doc<Team>(initials)
+        return this.teamsCol.doc<Team>(initials)
     }
 
     logoUrl(initials: string): Observable<string> {
-        return this._storage.ref(`teams/${initials}`).getDownloadURL().pipe(
+        return this.storage.ref(`teams/${initials}`).getDownloadURL().pipe(
             shareReplay(1)
         )
+    }
+
+    async addAthlete(athlete: Athlete) {
+        if (typeof athlete.team !== 'string') {
+            athlete.team = athlete.team.initials
+        }
+        await this.atlCol.add(athlete)
     }
 }
