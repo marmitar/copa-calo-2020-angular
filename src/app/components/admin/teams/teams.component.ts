@@ -15,31 +15,31 @@ import 'firebase/storage'
     styleUrls: ['../admin.component.scss']
 })
 export class AdminTeamsComponent {
-    readonly form = this._fb.group({
+    readonly form = this.fb.group({
         name: [null, Validators.required],
         init: [null]
     })
     logo: File
 
     constructor(
-        private _fb: FormBuilder,
-        private _ldn: LoadingService,
-        private _msgs: MessagesService,
-        private _cols: CollectionsService,
-        private _storage: AngularFireStorage
+        private fb: FormBuilder,
+        private ldn: LoadingService,
+        private msgs: MessagesService,
+        private cols: CollectionsService,
+        private storage: AngularFireStorage
     ) { }
 
     async create() {
         const {name, init} = this.form.value
         try {
-            const task = this._storage.ref(`/teams/${init}`).put(this.logo)
-            const creation = this._cols.team(init).set({ name, initials: init })
-            await this._ldn.runOn(Promise.all([task.then(), creation]))
+            const task = this.storage.ref(`/teams/${init}`).put(this.logo)
+            const creation = this.cols.team(init).set({ name, initials: init })
+            await this.ldn.runOn(Promise.all([task.then(), creation]))
 
-            this._msgs.hint(`Equipe ${name} criada`)
+            this.msgs.hint(`Equipe ${name} criada`)
         } catch (err) {
             await this.delete(false)
-            this._msgs.error(this._errorMsg(err), err)
+            this.emitError(err)
         }
 
     }
@@ -47,25 +47,21 @@ export class AdminTeamsComponent {
     async delete(show = true) {
         const {name, init} = this.form.value
         try {
-            const task =this._storage.ref(`/teams/${init}`).delete()
-            const del = this._cols.team(init).delete()
-            await this._ldn.runOn(Promise.all([task, del]))
+            const task =this.storage.ref(`/teams/${init}`).delete()
+            const del = this.cols.team(init).delete()
+            await this.ldn.runOn(Promise.all([task, del]))
 
             if (show) {
-                this._msgs.hint(`Equipe ${name} deletada`)
+                this.msgs.hint(`Equipe ${name} deletada`)
             }
         } catch (err) {
             if (show) {
-                this._msgs.error(this._errorMsg(err), err)
+                this.emitError(err)
             }
         }
     }
 
-    private _errorMsg(err: any): string {
-        if (err.message) {
-            return `${err.message}`
-        } else {
-            return `${err}`
-        }
+    emitError(err: any) {
+        this.msgs.error(`${err.message ?? err}`, err)
     }
 }

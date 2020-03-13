@@ -9,13 +9,16 @@ import { environment } from '##/environments/environment'
 export class MessagesService {
     constructor(private _snackBar: MatSnackBar) { }
 
-    private _log(data?: any) {
-        if (!environment.production && data !== undefined) {
-            console.log(data)
-        }
+    async error<T>(msg: String | string, source?: T, duration = 5000) {
+        this.debug(source)
+        await this.open(msg.toString(), duration, 'message-error')
     }
 
-    private async _open(message: string, duration: number, ...cls: string[]) {
+    async hint(msg: String | string, duration = 2500) {
+        await this.open(msg.toString(), duration, 'message-hint')
+    }
+
+    async open(message: string, duration: number, ...cls: string[]) {
         const ref = this._snackBar.open(message, 'Fechar', {
             duration,
             panelClass: cls
@@ -24,12 +27,9 @@ export class MessagesService {
         await ref.afterDismissed().toPromise()
     }
 
-    async error<T>(msg: String | string, source?: T, duration = 5000) {
-        this._log(source)
-        await this._open(msg.toString(), duration, 'message-error')
-    }
-
-    async hint(msg: String | string, duration = 2500) {
-        await this._open(msg.toString(), duration, 'message-hint')
+    debug(data?: any) {
+        if (!environment.production) {
+            console.log(data)
+        }
     }
 }

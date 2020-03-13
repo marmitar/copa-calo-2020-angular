@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { FormBuilder } from '@angular/forms'
 
 import { Observable, Subscription } from 'rxjs'
 import {
@@ -13,7 +13,7 @@ import { LoadingService } from '$$/loading.service'
 
 
 interface Query {
-    email?: string,
+    email: string,
     users: User[]
 }
 
@@ -25,88 +25,70 @@ interface Query {
 })
 export class AdminUsersComponent implements OnInit, OnDestroy {
 
-    private _users$: Observable<User[]>
-    private _autoTeamDisable: Subscription
+    private users$: Observable<User[]>
+    private autoTeamDisable: Subscription
 
     filteredEmails$: Observable<string[]>
-    form: FormGroup
+    readonly form = this.fb.group({
+        email: [null],
+        password: [{value: null, disabled: true}],
+        role:[null],
+        team: [{value: null, disabled: true}]
+    })
 
     constructor(
-        private _fb: FormBuilder,
-        private _msgs: MessagesService,
-        private _fns: FunctionsService,
-        private _ldn: LoadingService
+        private fb: FormBuilder,
+        private msgs: MessagesService,
+        private fns: FunctionsService,
+        private ldn: LoadingService
     ) {}
 
     ngOnInit() {
-        this.form = this._fb.group({
-            email: [null],
-            password: [{value: null, disabled: true}],
-            role:[null],
-            team: [{value: null, disabled: true}]
-        })
-
-        this._users$ = this._fns.listAllUsers().pipe(
+        this.users$ = this.fns.listAllUsers().pipe(
             retryWhen(errors => errors.pipe(delay(1000), take(2))),
             shareReplay(1)
         )
 
-        this._buildFilteredEmails()
-        this._buildAutoTeamDisable()
+        this.buildFilteredEmails()
+        this.buildAutoTeamDisable()
     }
 
-    private _buildFilteredEmails() {
+    ngOnDestroy() {
+        this.autoTeamDisable.unsubscribe()
+    }
+
+    private buildFilteredEmails() {
         const emailFormVal = this.form.get('email')!.valueChanges as Observable<string>
         this.filteredEmails$ = emailFormVal.pipe(
             startWith(''),
-            exhaustMap(email => this._users$.pipe(
-                map(this._filterUsers(email))
+            exhaustMap(email => this.users$.pipe(
+                map(users => filterUsers(users, email))
             )),
             tap(query => {
                 if (query.users.length === 1 &&
                     query.users[0].email.toLowerCase() === query.email) {
 
-                    this._setRole(query.users[0])
+                    this.setRole(query.users[0])
                 }
             }),
             map(query => query.users.map(user => user.email))
         )
     }
 
-    private _buildAutoTeamDisable() {
+    private buildAutoTeamDisable() {
         const roleFormVal = this.form.get('role')!.valueChanges
         const teamFormCtrl = this.form.get('team')!
 
-        this._autoTeamDisable = roleFormVal.pipe(
-            map(role => {
-                if (role === 'dm') {
-                    teamFormCtrl.enable({emitEvent: false})
-                } else {
-                    teamFormCtrl.disable({emitEvent: false})
-                }
-            })
-        ).subscribe()
-    }
-
-    ngOnDestroy() {
-        this._autoTeamDisable.unsubscribe()
-    }
-
-    private _filterUsers(email?: string): (users: User[]) => Query {
-        return users => {
-            if (email) {
-                const lower = email.toLowerCase()
-                return {
-                    email: lower,
-                    users: users.filter(user => user.email.toLowerCase().startsWith(lower))
-                }
+        this.autoTeamDisable = roleFormVal.subscribe(role => {
+            if (role === 'dm') {
+                teamFormCtrl.enable({emitEvent: false})
             } else {
-                return { email, users }
+                teamFormCtrl.disable({emitEvent: false})
             }
-        }
+        })
     }
 
-    private _setRole({role, team}: {role?: string, team?: string}) {
+    setRole({role, team}: {role?: string, team?: string}) {
         if (role) {
             this.form.get('role')!.setValue(role)
         }
@@ -117,7 +99,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
     async genPasswd(): Promise<void> {
         try {
-            const passwd = await this._fns.generatePassword().toPromise()
+            const passwd = await this.fns.generatePassword().toPromise()
             this.form.get('password')!.setValue(passwd)
         } catch (err) {
             this.emitError(err)
@@ -136,19 +118,24 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     async submit() {
         try {
 			const {email, password, role, team} = this.form.value
-            const ans = this._fns.updateUser(email, password, {role, team})
-            await this._ldn.runOn(ans.toPromise())
-            this._msgs.hint('Usuário atualizado ou criado')
+            const ans = this.fns.updateUser(email, password, {role, team})
+
+            await this.ldn.runOn(ans.toPromise())
+            this.msgs.hint('Usuário atualizado ou criado')
         } catch (err) {
             this.emitError(err)
         }
     }
 
     emitError(err: any) {
-        if (err.message) {
-            this._msgs.error(`${err.message}`, err)
-        } else {
-            this._msgs.error(`${err}`, err)
-        }
+        this.msgs.error(`${err.message ?? err}`, err)
+    }
+}
+
+function filterUsers(users: User[], email?: string | null): Query {
+    const lower = email?.toLowerCase() ?? ''
+    return {
+        email: lower,
+        users: users.filter(user => user.email.toLowerCase().startsWith(lower))
     }
 }

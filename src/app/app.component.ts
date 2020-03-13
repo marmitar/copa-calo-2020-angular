@@ -23,15 +23,15 @@ export class AppComponent implements OnInit {
     mobile$: Observable<boolean>
 
     constructor(
-        private _obs: ObserversService
+        private obs: ObserversService
     ) { }
 
     ngOnInit() {
         this.routes = [
             { title: 'Test', route: '/test', when: of(true) },
-            { title: 'Admin', route: '/admin', when: this._obs.isAdmin$ }
+            { title: 'Admin', route: '/admin', when: this.obs.isAdmin$ }
         ]
 
-        this.mobile$ = this._obs.isHPortrait$
+        this.mobile$ = this.obs.isHPortrait$
     }
 }

@@ -39,9 +39,9 @@ export class AthletesCreateComponent implements OnInit, OnDestroy {
         this.teamAutoLock = this.obs.user$.subscribe(user => {
             if (user?.role === 'dm') {
                 team.setValue(user.team)
-                team.disable()
+                team.disable({emitEvent: false})
             } else {
-                team.enable()
+                team.enable({emitEvent: false})
             }
         })
     }
