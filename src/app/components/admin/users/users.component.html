@@ -1,46 +1,78 @@
-<form [formGroup]="form" novalidate class="admin-form" (ngSubmit)="submit()">
+<mat-card class="container">
+    <form [formGroup]="form" novalidate (ngSubmit)="submit()">
+        <mat-card-header>
+            <mat-card-title>Usuários</mat-card-title>
+            <mat-card-subtitle>Criar ou alterar usuários</mat-card-subtitle>
+        </mat-card-header>
 
-    <mat-form-field class="full-width">
+        <mat-card-content class="content">
+            <ng-container *ngTemplateOutlet="formEmail;context:form.controls"></ng-container>
+            <ng-container *ngTemplateOutlet="formPassword;context:form.controls"></ng-container>
+            <ng-container *ngTemplateOutlet="pwToggle;context:form.controls"></ng-container>
+            <ng-container *ngTemplateOutlet="formRole;context:form.controls"></ng-container>
+            <ng-container *ngTemplateOutlet="formTeam;context:form.controls"></ng-container>
+        </mat-card-content>
+
+        <mat-card-actions class="row" align="end">
+            <span class="flex-filling"></span>
+            <button mat-raised-button color="primary" type="submit">
+                Atualizar Usuário
+            </button>
+        </mat-card-actions>
+    </form>
+</mat-card>
+
+
+<ng-template #formEmail let-ctrl="email">
+    <mat-form-field>
         <mat-label>E-mail</mat-label>
-        <input matInput type="email" formControlName="email" [matAutocomplete]="autoEmails">
+        <input matInput type="email" [formControl]="ctrl" [matAutocomplete]="autoEmails">
 
         <mat-autocomplete #autoEmails="matAutocomplete">
-            <mat-option *ngFor="let email of this.filteredEmails$ | async" [value]="email">
+            <mat-option *ngFor="let email of filteredEmails$ | async" [value]="email">
                 {{ email }}
             </mat-option>
         </mat-autocomplete>
     </mat-form-field>
+</ng-template>
 
-    <mat-form-field class="full-width">
+<ng-template #formPassword let-ctrl="password">
+    <mat-form-field>
         <mat-label>Senha</mat-label>
-        <input matInput type="text" formControlName="password">
+        <input matInput type="text" [formControl]="ctrl">
     </mat-form-field>
+</ng-template>
 
-    <div class="full-width password-control">
+<ng-template #pwToggle let-ctrl="password">
+    <div class="row">
         <mat-slide-toggle
-            [checked]="form.get('password')!.enabled"
-            (change)="this.togglePasswd()">
+            [checked]="ctrl.enabled"
+            (change)="ctrl.enabled? ctrl.disable() : ctrl.enable()">
                 Mudar Senha
         </mat-slide-toggle>
+
         <span class="flex-filling"></span>
-
-        <button mat-raised-button (click)="genPasswd()" type="button">Gerar Senha</button>
+        <button mat-raised-button (click)="genPasswd()" type="button">
+            Gerar Senha
+        </button>
     </div>
+</ng-template>
 
-    <mat-form-field class="full-width">
+<ng-template #formRole let-ctrl="role">
+    <mat-form-field>
         <mat-label>Permissão</mat-label>
-        <mat-select formControlName="role">
+        <mat-select [formControl]="ctrl">
             <mat-option value="admin">Admin</mat-option>
             <mat-option value="dm">DM</mat-option>
             <mat-option value="arb">Arbitro</mat-option>
             <mat-option value="none">-</mat-option>
         </mat-select>
     </mat-form-field>
+</ng-template>
 
-    <mat-form-field class="full-width">
+<ng-template #formTeam let-ctrl="team">
+    <mat-form-field>
         <mat-label>Equipe</mat-label>
-        <input matInput type="text" formControlName="team">
+        <input matInput type="text" [formControl]="ctrl">
     </mat-form-field>
-
-    <button mat-raised-button color="primary" type="submit">Atualizar Usuário</button>
-</form>
+</ng-template>

@@ -1,0 +1,53 @@
+.container {
+    $margin: 20px;
+    min-width: 240px;
+    max-width: 720px;
+    margin: $margin auto;
+
+    .content {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        align-items: stretch;
+
+        & > * {
+            margin-bottom: $margin;
+        }
+        & > *:last-child {
+            margin-bottom: 0px;
+        }
+    }
+    .row {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-around;
+
+        & > * {
+            flex: 1 1 auto;
+            margin-right: $margin;
+        }
+        & > *:last-child {
+            flex: 1 1 auto;
+            margin-right: 0px;
+        }
+    }
+}
+
+.collection {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+
+    & > * {
+        margin-right: 32px;
+    }
+    & > *:last-child {
+        margin-right: 0px;
+    }
+}
+
+.flex-filling {
+    flex: 1 1 auto
+}

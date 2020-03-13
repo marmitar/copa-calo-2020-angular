@@ -3,19 +3,13 @@ import { FormBuilder } from '@angular/forms'
 
 import { Observable, Subscription } from 'rxjs'
 import {
-    map, tap, delay, startWith, exhaustMap,
+    map, delay, startWith, exhaustMap,
     retryWhen, take, shareReplay
 } from 'rxjs/operators'
 
 import { MessagesService } from '$$/messages.service'
 import { FunctionsService, User } from '$$/functions.service'
 import { LoadingService } from '$$/loading.service'
-
-
-interface Query {
-    email: string,
-    users: User[]
-}
 
 
 @Component({
@@ -58,20 +52,18 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     }
 
     private buildFilteredEmails() {
-        const emailFormVal = this.form.get('email')!.valueChanges as Observable<string>
+        const emailFormVal = this.form.get('email')!.valueChanges as Observable<string | undefined | null>
         this.filteredEmails$ = emailFormVal.pipe(
             startWith(''),
             exhaustMap(email => this.users$.pipe(
-                map(users => filterUsers(users, email))
-            )),
-            tap(query => {
-                if (query.users.length === 1 &&
-                    query.users[0].email.toLowerCase() === query.email) {
-
-                    this.setRole(query.users[0])
-                }
-            }),
-            map(query => query.users.map(user => user.email))
+                map(users => {
+                    const filtered = filterUsers(users, email)
+                    if (filtered.length === 1 && filtered[0].email.toLowerCase() === email?.toLowerCase()) {
+                        this.setRole(users[0])
+                    }
+                    return filtered.map(user => user.email)
+                })
+            ))
         )
     }
 
@@ -106,15 +98,6 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
         }
     }
 
-    togglePasswd() {
-        const ctrl = this.form.get('password')!
-        if (ctrl.disabled) {
-            ctrl.enable()
-        } else {
-            ctrl.disable()
-        }
-    }
-
     async submit() {
         try {
 			const {email, password, role, team} = this.form.value
@@ -132,10 +115,8 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     }
 }
 
-function filterUsers(users: User[], email?: string | null): Query {
+function filterUsers(users: User[], email?: string | null): User[] {
     const lower = email?.toLowerCase() ?? ''
-    return {
-        email: lower,
-        users: users.filter(user => user.email.toLowerCase().startsWith(lower))
-    }
+
+    return users.filter(user => user.email.toLowerCase().startsWith(lower))
 }

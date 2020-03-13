@@ -41,7 +41,6 @@ export class AdminTeamsComponent {
             await this.delete(false)
             this.emitError(err)
         }
-
     }
 
     async delete(show = true) {
