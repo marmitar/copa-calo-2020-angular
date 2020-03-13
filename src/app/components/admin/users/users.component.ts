@@ -135,9 +135,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
     async submit() {
         try {
-			const {email, passwordVal, role, teamVal} = this.form.value
-			const password = this.form.get('password')!.enabled ? passwordVal : undefined
-            const team = this.form.get('team')!.enabled ? teamVal : undefined
+			const {email, password, role, team} = this.form.value
             const ans = this._fns.updateUser(email, password, {role, team})
             await this._ldn.runOn(ans.toPromise())
             this._msgs.hint('Usuário atualizado ou criado')
