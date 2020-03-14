@@ -34,7 +34,9 @@
 </ng-template>
 
 
-<mat-tab-group mat-stretch-tabs class="full">
+<mat-tab-group mat-stretch-tabs class="full"
+        [selectedIndex]="tab"
+        (selectedIndexChange)="setTab($event)">
     <mat-tab label="Login">
         <ng-container
             *ngTemplateOutlet="loginForm;context:login">

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, Inject } from '@angular/core'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
-import { MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { AngularFireAuth } from '@angular/fire/auth'
 
 import { Observable } from 'rxjs'
@@ -10,6 +10,18 @@ type UserCredental = firebase.auth.UserCredential
 
 import { LoadingService } from '$$/loading.service'
 import { MessagesService } from '$$/messages.service'
+
+
+interface CtxData {
+    email?: string
+    password?: string
+    signUp?: boolean,
+}
+
+interface DialogData {
+    data?: CtxData | null,
+    reopen: (data?: CtxData | null) => void
+}
 
 
 @Component({
@@ -29,10 +41,14 @@ export class LoginComponent implements OnInit {
         )
     }
 
-    open() {
-        return this.matDialog.open<LoginDialogComponent, undefined, UserCredental>(LoginDialogComponent, {
+    open(data?: CtxData | null) {
+        return this.matDialog.open<LoginDialogComponent, DialogData, UserCredental>(LoginDialogComponent, {
             height: '340px',
-            width: '320px'
+            width: '320px',
+            data: {
+                data,
+                reopen: (data) => this.open(data)
+            }
         })
     }
 }
@@ -63,10 +79,27 @@ class Context {
             password: this.password
         })
 
-        this.submit = () => this.parent.signIn(this.form.value, this.signUp)
+        this.submit = () => this.parent.signIn(this.value())
+    }
+
+    load({email, password}: CtxData) {
+        if (email) {
+            this.email.setValue(email)
+        }
+        if (password) {
+            this.password.setValue(password)
+        }
+        this.parent.tab = this.signUp? 1 : 0
+    }
+
+    value(): CtxData {
+        return {
+            email: this.email.value,
+            password: this.password.value,
+            signUp: this.signUp
+        }
     }
 }
-
 
 @Component({
     selector: 'app-login-dialog',
@@ -76,32 +109,50 @@ class Context {
 export class LoginDialogComponent implements OnInit {
     login: Context
     signUp: Context
+    tab: 0 | 1 = 0
 
     constructor(
         private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
         private auth: AngularFireAuth,
         private ldn: LoadingService,
-        private msgs: MessagesService
+        private msgs: MessagesService,
+        @Inject(MAT_DIALOG_DATA) readonly data: DialogData
     ) { }
 
     ngOnInit() {
         this.login = new Context(this, false, 'Login')
         this.signUp = new Context(this, true, 'Registrar', 6)
+
+        if (this.data.data) {
+            if (this.data.data.signUp) {
+                this.signUp.load(this.data.data)
+            } else {
+                this.login.load(this.data.data)
+            }
+        }
     }
 
-    async signIn({email, password}: {[key: string]: string}, signUp?: boolean) {
+    setTab(tab: 0 | 1) {
+        if (tab == 0) {
+            this.login.load(this.signUp.value())
+        } else {
+            this.signUp.load(this.login.value())
+        }
+    }
+
+    async signIn({email, password, signUp}: CtxData) {
         const signingIn = signUp ?
-            this.auth.createUserWithEmailAndPassword(email, password)
-            : this.auth.signInWithEmailAndPassword(email, password)
+            this.auth.createUserWithEmailAndPassword(email!, password!)
+            : this.auth.signInWithEmailAndPassword(email!, password!)
 
         try {
-            const creds = await this.ldn.runOn(signingIn)
             this.dialog.close()
-            return creds
+            return await this.ldn.runOn(signingIn)
 
         } catch (err) {
             const msg = this.signInErrorMessage(err)
             this.msgs.error(msg, err)
+            this.data.reopen({email, password, signUp})
         }
     }
 
