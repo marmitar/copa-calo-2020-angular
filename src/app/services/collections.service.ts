@@ -48,7 +48,8 @@ export class CollectionsService {
         map(teams => teams.reduce((obj, team) => {
             obj[team.initials] = team
             return obj
-        }, {}))
+        }, {})),
+        shareReplay(1)
     )
     readonly athletes$ = combineLatest(this.teamByInitial$, this.atlCol.valueChanges()).pipe(
         map(([teams, atls]) => atls.map(atl => {
@@ -59,8 +60,12 @@ export class CollectionsService {
 
     constructor(private firestore: AngularFirestore) { }
 
-    team(initials: string) {
+    teamRef(initials: string) {
         return this.teamsCol.doc<Team>(initials)
+    }
+
+    team(initials: string) {
+        return this.teamByInitial$.pipe(map(teams => teams[initials]))
     }
 
     async addAthlete(athlete: Athlete) {

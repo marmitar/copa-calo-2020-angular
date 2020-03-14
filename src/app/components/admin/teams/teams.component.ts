@@ -31,7 +31,7 @@ export class AdminTeamsComponent {
 
     private async createWith(name: string, initials: string) {
         const photo = await this.storage.ref(`/teams/${initials}`).put(this.logo)
-        await this.cols.team(initials).set({ name, initials, logoUrl: photo.downloadURL! })
+        await this.cols.teamRef(initials).set({ name, initials, logoUrl: photo.downloadURL! })
     }
 
     async create() {
@@ -49,7 +49,7 @@ export class AdminTeamsComponent {
         const {name, init} = this.form.value
         try {
             const task =this.storage.ref(`/teams/${init}`).delete()
-            const del = this.cols.team(init).delete()
+            const del = this.cols.teamRef(init).delete()
             await this.ldn.runOn(Promise.all([task, del]))
 
             if (show) {
