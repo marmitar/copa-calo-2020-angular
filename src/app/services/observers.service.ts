@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { AngularFireAuth } from '@angular/fire/auth'
 
-import { of, OperatorFunction, throwError } from 'rxjs'
+import { OperatorFunction, throwError } from 'rxjs'
 import { pluck, shareReplay, exhaustMap, map, first, startWith } from 'rxjs/operators'
 
 
@@ -36,13 +36,13 @@ export class ObserversService {
 
     readonly user$ = this.auth.user.pipe(
         startWith(null),
-        exhaustMap(user => {
+        exhaustMap(async user => {
             if (user !== null && user !== undefined) {
-                return user.getIdTokenResult().then<Role>(
-                    result => result.claims ?? {}
-                )
+                const result = await user.getIdTokenResult()
+                const role = result.claims ?? {}
+                return role as Role
             } else {
-                return of(null)
+                return null
             }
         }),
         shareReplay(1)
