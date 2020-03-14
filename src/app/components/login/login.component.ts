@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog'
 import { AngularFireAuth } from '@angular/fire/auth'
 
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, startWith } from 'rxjs/operators'
 import * as firebase from 'firebase'
 type UserCredental = firebase.auth.UserCredential
 
@@ -23,7 +23,10 @@ export class LoginComponent implements OnInit {
     constructor(public auth: AngularFireAuth, private matDialog: MatDialog) {}
 
     ngOnInit() {
-        this.unlogged$ = this.auth.user.pipe(map(user => user === null))
+        this.unlogged$ = this.auth.user.pipe(
+            startWith(null),
+            map(user => user === null)
+        )
     }
 
     open() {
