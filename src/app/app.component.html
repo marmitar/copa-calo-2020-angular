@@ -54,4 +54,5 @@
             <app-login></app-login>
         </nav>
     </mat-toolbar>
+    <mat-progress-bar mode="indeterminate" color="warn" *ngIf="ldn.running$ | async"></mat-progress-bar>
 </ng-template>

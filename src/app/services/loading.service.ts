@@ -1,33 +1,34 @@
 import { Injectable } from '@angular/core'
-import { Overlay } from '@angular/cdk/overlay'
-import { ComponentPortal } from '@angular/cdk/portal'
-import { MatSpinner } from '@angular/material/progress-spinner'
 
-import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { Observable, Subject,  } from 'rxjs'
+import { tap, scan, shareReplay, map } from 'rxjs/operators'
 
 
 @Injectable({
     providedIn: 'root'
 })
 export class LoadingService {
-    private ref = this.overlay.create({
-        hasBackdrop: true,
-        backdropClass: 'dark-backdrop',
-        positionStrategy: this.overlay.position()
-            .global()
-            .centerHorizontally()
-            .centerVertically()
-    })
+    private count$ = new Subject<boolean>()
+    readonly running$ = this.count$.pipe(
+        scan((acc, cur) => cur? acc + 1 : acc - 1, 0),
+        shareReplay(1),
+        map(val => val > 0)
+    )
 
-    constructor(private overlay: Overlay) { }
+    constructor() { }
 
     runOn<T>(action: Promise<T>): Promise<T>
     runOn<T>(action: Observable<T>, onlyFinished?: boolean): Observable<T>
     runOn<T>(action: Promise<T> | Observable<T>, onlyFinished?: boolean): Promise<T> | Observable<T> {
-        const portal = new ComponentPortal(MatSpinner)
-        this.ref.attach(portal)
-        const stop = () => this.ref.detach()
+        this.count$.next(true)
+
+        let stopped = false
+        const stop = () => {
+            if (!stopped) {
+                this.count$.next(false)
+                stopped = true
+            }
+        }
 
         if (action instanceof Promise) {
             return action.finally(stop)

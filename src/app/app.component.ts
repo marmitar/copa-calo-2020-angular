@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core'
+import { LoadingService } from './services/loading.service'
 
 import { ObserversService } from '$$/observers.service'
 import { Observable, of } from 'rxjs'
@@ -23,7 +24,8 @@ export class AppComponent implements OnInit {
     mobile$: Observable<boolean>
 
     constructor(
-        private obs: ObserversService
+        private obs: ObserversService,
+        public ldn: LoadingService
     ) { }
 
     ngOnInit() {
