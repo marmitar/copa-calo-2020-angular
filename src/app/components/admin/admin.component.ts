@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core'
+import { Component } from '@angular/core'
 
 
 @Component({
@@ -6,6 +6,4 @@ import { Component, HostBinding } from '@angular/core'
     templateUrl: './admin.component.html',
     styleUrls: ['./admin.component.scss']
 })
-export class AdminComponent {
-    @HostBinding('class') class = 'collection'
-}
+export class AdminComponent { }

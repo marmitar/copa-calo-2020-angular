@@ -13,3 +13,18 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     background-color: mat-color($warn, darker);
     color: whitesmoke;
 }
+
+router-outlet + * {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: flex-start;
+
+    & > * {
+        margin-right: 32px;
+    }
+    & > *:last-child {
+        margin-right: 0px;
+    }
+}
