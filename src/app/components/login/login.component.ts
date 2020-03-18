@@ -1,12 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core'
+import { Router } from '@angular/router'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { AngularFireAuth } from '@angular/fire/auth'
 
 import { Observable } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
-import * as firebase from 'firebase'
-type UserCredental = firebase.auth.UserCredential
 
 import { LoadingService } from '$$/loading.service'
 import { MessagesService } from '$$/messages.service'
@@ -16,12 +15,13 @@ import { UsersService } from '$$/users.service'
 interface CtxData {
     email?: string
     password?: string
-    signUp?: boolean,
+    signUp?: boolean
 }
 
 interface DialogData {
     data?: CtxData | null,
-    reopen: (data?: CtxData | null) => void
+    reopen: (data?: CtxData | null) => void,
+    ldn: LoadingService
 }
 
 
@@ -33,7 +33,13 @@ interface DialogData {
 export class LoginComponent implements OnInit {
     unlogged$: Observable<boolean>
 
-    constructor(public auth: AngularFireAuth, private matDialog: MatDialog) {}
+    constructor(
+        public auth: AngularFireAuth,
+        private matDialog: MatDialog,
+        private ldn: LoadingService,
+        private msgs: MessagesService,
+        private router: Router
+    ) {}
 
     ngOnInit() {
         this.unlogged$ = this.auth.user.pipe(
@@ -43,14 +49,32 @@ export class LoginComponent implements OnInit {
     }
 
     open(data?: CtxData | null) {
-        return this.matDialog.open<LoginDialogComponent, DialogData, UserCredental>(LoginDialogComponent, {
+        return this.matDialog.open<LoginDialogComponent, DialogData>(LoginDialogComponent, {
             height: '340px',
             width: '320px',
             data: {
                 data,
-                reopen: (data) => this.open(data)
+                reopen: (data) => this.open(data),
+                ldn: this.ldn
             }
         })
+    }
+
+    async logout() {
+        const stop = this.ldn.start()
+
+        try {
+            await this.auth.signOut()
+            const routed = await this.router.navigate([''])
+            if (!routed) {
+                throw new Error('problema interno')
+            }
+        } catch (err) {
+            this.msgs.error(`${err.message ?? err}`, err)
+
+        } finally {
+            stop()
+        }
     }
 }
 
@@ -108,19 +132,20 @@ class Context {
     styleUrls: ['./login.component.scss']
 })
 export class LoginDialogComponent implements OnInit {
+    private ldn: LoadingService
     login: Context
     signUp: Context
     tab: 0 | 1 = 0
 
     constructor(
-        private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
+        private dialog: MatDialogRef<LoginDialogComponent>,
         private users: UsersService,
-        private ldn: LoadingService,
         private msgs: MessagesService,
         @Inject(MAT_DIALOG_DATA) readonly data: DialogData
     ) { }
 
     ngOnInit() {
+        this.ldn = this.data.ldn
         this.login = new Context(this, false, 'Login')
         this.signUp = new Context(this, true, 'Registrar', 6)
 
@@ -170,6 +195,7 @@ export class LoginDialogComponent implements OnInit {
             case 'auth/too-many-requests':
                 return 'Muitas tentativas erradas, espere um pouco'
             case 'auth/email-already-exists':
+            case 'auth/email-already-in-use':
                 return 'E-mail já registrado'
             default:
                 return `${err.message ?? err}`
