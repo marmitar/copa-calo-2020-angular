@@ -8,6 +8,9 @@ import { AngularFirestore } from '@angular/fire/firestore'
 import 'firebase/firestore'
 
 
+export type ReducedAthlete = Reduced<Athlete, 'team', 'initials'>
+
+
 @Injectable({
     providedIn: 'root'
 })
@@ -20,7 +23,7 @@ export class AthletesService {
         private users: UsersService
     ) { }
 
-    private collection = this.firestore.collection<Reduced<Athlete, 'team', 'initials'>>('/athletes')
+    private collection = this.firestore.collection<ReducedAthlete>('/athletes')
 
     readonly athletes$ = this.teams.teamByInitial$.pipe(
         exhaustMap(teams => this.collection.valueChanges().pipe(
@@ -44,7 +47,7 @@ export class AthletesService {
         )
     }
 
-    async createAthletes(...athletes: Reduced<Athlete, 'team', 'initials'>[]) {
+    async createAthletes(...athletes: ReducedAthlete[]) {
         const fun = this.fns.httpsCallable('createAthletes')
         await fun(athletes).pipe(
             this.users.requireRole('dm'),
