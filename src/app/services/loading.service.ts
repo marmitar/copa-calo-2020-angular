@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
-import { tap, scan, shareReplay, map } from 'rxjs/operators'
+import { tap, scan, shareReplay, map, pairwise } from 'rxjs/operators'
 
 
 const enum Step {
@@ -9,10 +8,8 @@ const enum Step {
 }
 
 
-@Injectable({
-    providedIn: 'root'
-})
-export class LoadingService {
+// abstract class for loaders
+export abstract class LoadingService {
 
     private step$ = new Subject<Step>()
     private count$ = this.step$.pipe(
@@ -21,8 +18,18 @@ export class LoadingService {
     )
 
     readonly running$ = this.count$.pipe(map(cnt => cnt > 0))
+    protected drawSub = this.running$.pipe(pairwise()).subscribe(([last, cur]) => {
+        if (cur && !last) {
+            this.startLoading()
+        } else if (!cur && last) {
+            this.stopLoading()
+        }
+    })
 
     constructor() { }
+
+    protected abstract startLoading(): void
+    protected abstract stopLoading(): void
 
     start() {
         this.step$.next(Step.increment)

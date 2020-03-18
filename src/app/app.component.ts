@@ -12,7 +12,18 @@ export interface Route {
     when: Observable<boolean>
 }
 
-export abstract class GlobalLoadingService extends LoadingService { }
+export class GlobalLoadingService extends LoadingService {
+    static new() {
+        return new GlobalLoadingService()
+    }
+
+    private constructor() {
+        super()
+    }
+
+    protected startLoading() {}
+    protected stopLoading() {}
+}
 
 
 @Component({
@@ -20,7 +31,7 @@ export abstract class GlobalLoadingService extends LoadingService { }
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     providers: [
-        { provide: GlobalLoadingService, useClass: LoadingService }
+        { provide: LoadingService, useFactory: GlobalLoadingService.new }
     ]
 })
 export class AppComponent implements OnInit {
@@ -30,7 +41,7 @@ export class AppComponent implements OnInit {
     mobile$: Observable<boolean>
 
     constructor(
-        public ldn: GlobalLoadingService,
+        public ldn: LoadingService,
         private obs: ObserversService,
         private usr: UsersService
     ) { }
