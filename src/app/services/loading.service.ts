@@ -1,41 +1,54 @@
 import { Injectable } from '@angular/core'
-
-import { Observable, Subject,  } from 'rxjs'
+import { Subject } from 'rxjs'
 import { tap, scan, shareReplay, map } from 'rxjs/operators'
+
+
+const enum Step {
+    increment,
+    decrement
+}
 
 
 @Injectable({
     providedIn: 'root'
 })
 export class LoadingService {
-    private count$ = new Subject<boolean>()
-    readonly running$ = this.count$.pipe(
-        scan((acc, cur) => cur? acc + 1 : acc - 1, 0),
-        shareReplay(1),
-        map(val => val > 0)
+
+    private step$ = new Subject<Step>()
+    private count$ = this.step$.pipe(
+        scan((cnt, step) => step == Step.increment? cnt + 1 : cnt - 1, 0),
+        shareReplay(1)
     )
+
+    readonly running$ = this.count$.pipe(map(cnt => cnt > 0))
 
     constructor() { }
 
-    runOn<T>(action: Promise<T>): Promise<T>
-    runOn<T>(action: Observable<T>, onlyFinished?: boolean): Observable<T>
-    runOn<T>(action: Promise<T> | Observable<T>, onlyFinished?: boolean): Promise<T> | Observable<T> {
-        this.count$.next(true)
+    start() {
+        this.step$.next(Step.increment)
 
         let stopped = false
-        const stop = () => {
+        return () => {
             if (!stopped) {
-                this.count$.next(false)
+                this.step$.next(Step.decrement)
                 stopped = true
             }
         }
+    }
 
-        if (action instanceof Promise) {
-            return action.finally(stop)
+    runUntil<T>(onlyFinished?: boolean) {
+        const stop = this.start()
+        const onNext = onlyFinished? () => undefined : stop
+        return tap<T>(onNext, stop, stop)
+    }
 
-        } else {
-            const onNext = onlyFinished? () => undefined : stop
-            return action.pipe(tap(onNext, stop, stop))
+    async runOn<T>(action: Promise<T>) {
+        const stop = this.start()
+
+        try {
+            return await action
+        } finally {
+            stop()
         }
     }
 }

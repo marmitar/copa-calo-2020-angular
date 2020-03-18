@@ -10,6 +10,7 @@ type UserCredental = firebase.auth.UserCredential
 
 import { LoadingService } from '$$/loading.service'
 import { MessagesService } from '$$/messages.service'
+import { UsersService } from '$$/users.service'
 
 
 interface CtxData {
@@ -113,7 +114,7 @@ export class LoginDialogComponent implements OnInit {
 
     constructor(
         private dialog: MatDialogRef<LoginDialogComponent, UserCredental>,
-        private auth: AngularFireAuth,
+        private users: UsersService,
         private ldn: LoadingService,
         private msgs: MessagesService,
         @Inject(MAT_DIALOG_DATA) readonly data: DialogData
@@ -142,8 +143,8 @@ export class LoginDialogComponent implements OnInit {
 
     async signIn({email, password, signUp}: CtxData) {
         const signingIn = signUp ?
-            this.auth.createUserWithEmailAndPassword(email!, password!)
-            : this.auth.signInWithEmailAndPassword(email!, password!)
+            this.users.auth.createUserWithEmailAndPassword(email!, password!)
+            : this.users.auth.signInWithEmailAndPassword(email!, password!)
 
         try {
             this.dialog.close()

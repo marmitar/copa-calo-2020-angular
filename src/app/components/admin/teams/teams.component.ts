@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms'
 
 import { LoadingService } from '$$/loading.service'
 import { MessagesService } from '$$/messages.service'
-import { CollectionsService } from '$$/collections.service'
+import { TeamsService } from '$$/teams.service'
 
 import { AngularFireStorage } from '@angular/fire/storage'
 import 'firebase/storage'
@@ -25,13 +25,13 @@ export class AdminTeamsComponent {
         private fb: FormBuilder,
         private ldn: LoadingService,
         private msgs: MessagesService,
-        private cols: CollectionsService,
+        private tms: TeamsService,
         private storage: AngularFireStorage
     ) { }
 
     private async createWith(name: string, initials: string) {
         const photo = await this.storage.ref(`/teams/${initials}`).put(this.logo)
-        await this.cols.teamRef(initials).set({ name, initials, logoUrl: photo.downloadURL! })
+        await this.tms.teamRef(initials).set({ name, initials, logoUrl: photo.downloadURL! })
     }
 
     async create() {
@@ -49,7 +49,7 @@ export class AdminTeamsComponent {
         const {name, init} = this.form.value
         try {
             const task =this.storage.ref(`/teams/${init}`).delete()
-            const del = this.cols.teamRef(init).delete()
+            const del = this.tms.teamRef(init).delete()
             await this.ldn.runOn(Promise.all([task, del]))
 
             if (show) {

@@ -8,7 +8,7 @@ import {
 } from 'rxjs/operators'
 
 import { MessagesService } from '$$/messages.service'
-import { FunctionsService, User } from '$$/functions.service'
+import { UsersService } from '$$/users.service'
 import { LoadingService } from '$$/loading.service'
 
 
@@ -33,12 +33,12 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     constructor(
         private fb: FormBuilder,
         private msgs: MessagesService,
-        private fns: FunctionsService,
+        private usr: UsersService,
         private ldn: LoadingService
     ) {}
 
     ngOnInit() {
-        this.users$ = this.fns.listAllUsers().pipe(
+        this.users$ = this.usr.listAllUsers().pipe(
             retryWhen(errors => errors.pipe(delay(1000), take(2))),
             shareReplay(1)
         )
@@ -80,7 +80,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
         })
     }
 
-    setRole({role, team}: {role?: string, team?: string}) {
+    setRole({role, team}: {role?: string, team?: Team}) {
         if (role) {
             this.form.get('role')!.setValue(role)
         }
@@ -91,7 +91,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
 
     async genPasswd(): Promise<void> {
         try {
-            const passwd = await this.fns.generatePassword().toPromise()
+            const passwd = await this.usr.generatePassword().toPromise()
             this.form.get('password')!.setValue(passwd)
         } catch (err) {
             this.emitError(err)
@@ -101,7 +101,7 @@ export class AdminUsersComponent implements OnInit, OnDestroy {
     async submit() {
         try {
 			const {email, password, role, team} = this.form.value
-            const ans = this.fns.updateUser(email, password, {role, team})
+            const ans = this.usr.updateUser(email, password, {role, team})
 
             await this.ldn.runOn(ans.toPromise())
             this.msgs.hint('Usuário atualizado ou criado')

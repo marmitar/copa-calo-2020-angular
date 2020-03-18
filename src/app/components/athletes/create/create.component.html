@@ -1,40 +1,30 @@
-<form [formGroup]="form" novalidate class="admin-form" (ngSubmit)="submit()">
+<form [formGroup]="form" novalidate class="content" (ngSubmit)="submit()">
 
-    <mat-form-field class="full-width" hideRequiredMarker>
+    <mat-form-field hideRequiredMarker>
         <mat-label>Nome</mat-label>
-        <input matInput #formName type="text" formControlName="name" required>
-        <mat-error *ngIf="formName.invalid">Precisa de um valor</mat-error>
+        <input matInput type="text" formControlName="name" required>
+        <mat-error *ngIf="form.get('name')!.invalid">Precisa de um valor</mat-error>
     </mat-form-field>
 
-    <mat-form-field class="full-width" hideRequiredMarker>
+    <mat-form-field hideRequiredMarker>
         <mat-label>R.G.</mat-label>
-        <input matInput #formRg type="text" formControlName="rg" required>
-        <mat-error *ngIf="formRg.invalid">Precisa de um valor</mat-error>
+        <input matInput type="text" formControlName="rg" required>
+        <mat-error *ngIf="form.get('rg')!.invalid">Precisa de um valor</mat-error>
     </mat-form-field>
 
-    <mat-form-field class="full-width" hideRequiredMarker>
+    <mat-form-field hideRequiredMarker>
         <mat-label>Órgão Emissor</mat-label>
-        <input matInput #formRgo type="text" formControlName="rgOrgao" required>
-        <mat-error *ngIf="formRgo.invalid">Precisa de um valor</mat-error>
+        <input matInput type="text" formControlName="rgOrgao" required>
+        <mat-error *ngIf="form.get('rgOrgao')!.invalid">Precisa de um valor</mat-error>
     </mat-form-field>
 
-    <mat-form-field class="full-width" hideRequiredMarker>
+    <mat-form-field hideRequiredMarker>
         <mat-label>Gênero</mat-label>
         <mat-select formControlName="sex" required>
-            <mat-option value="feminino">Feminino</mat-option>
-            <mat-option value="masculino">Masculino</mat-option>
+            <mat-option value="fem">Feminino</mat-option>
+            <mat-option value="masc">Masculino</mat-option>
         </mat-select>
         <mat-error *ngIf="form.get('sex')!.invalid">Precisa de um valor</mat-error>
-    </mat-form-field>
-
-    <mat-form-field class="full-width" hideRequiredMarker>
-        <mat-label>Equipe</mat-label>
-        <mat-select formControlName="team" required>
-            <mat-option *ngFor="let team of cols.teams$ | async" [value]="team.initials">
-                {{ team.name }}
-            </mat-option>
-        </mat-select>
-        <mat-error *ngIf="form.get('team')!.invalid">Precisa de um valor</mat-error>
     </mat-form-field>
 
     <button mat-raised-button [disabled]="form.invalid"

@@ -1,12 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, HostBinding } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms'
 
-import { ObserversService } from '$$/observers.service'
-import { CollectionsService } from '$$/collections.service'
+import { AthletesService } from '$$/athletes.service'
 import { LoadingService } from '$$/loading.service'
 import { MessagesService } from '$$/messages.service'
-
-import { Subscription } from 'rxjs'
+import { TeamsService } from '$$/teams.service'
 
 
 @Component({
@@ -14,48 +12,33 @@ import { Subscription } from 'rxjs'
     templateUrl: './create.component.html',
     styleUrls: ['./create.component.scss']
 })
-export class AthletesCreateComponent implements OnInit, OnDestroy {
+export class AthletesCreateComponent {
     readonly form = this.fb.group({
         name: [null, Validators.required],
         rg: [null, Validators.required],
         rgOrgao: [null, Validators.required],
 
-        sex: [null, Validators.required],
-        team: [null, Validators.required]
+        sex: [null, Validators.required]
     })
 
+    @HostBinding('class') class = 'container'
+
+
     constructor(
-        public cols: CollectionsService,
-        private obs: ObserversService,
+        private atl: AthletesService,
+        public tms: TeamsService,
         private ldn: LoadingService,
         private msgs: MessagesService,
         private fb: FormBuilder
     ) { }
 
-    private teamAutoLock: Subscription
-
-    ngOnInit() {
-        const team = this.form.get('team')!
-        this.teamAutoLock = this.obs.user$.subscribe(user => {
-            if (user?.role === 'dm') {
-                team.setValue(user.team)
-                team.disable({emitEvent: false})
-            } else {
-                team.enable({emitEvent: false})
-            }
-        })
-    }
-
-    ngOnDestroy() {
-        this.teamAutoLock.unsubscribe()
-    }
-
     async submit() {
         try {
-            await this.ldn.runOn(this.cols.addAthlete(this.form.value))
+            const athlete = this.form.value
+            await this.ldn.runOn(this.atl.createAthletes({...athlete}))
 
-            const name = this.form.get('name')!.value
-            this.msgs.hint(`${name} registrado`)
+            const artigo = athlete.sex === 'fem' ? 'a' : 'o'
+            this.msgs.hint(`${athlete.name} registrad${artigo}`)
         } catch (err) {
             this.msgs.error(errorMessage(err), err)
         }
